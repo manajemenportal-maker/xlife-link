@@ -273,11 +273,30 @@
 
     window.doLogin = async function () {
       try {
-        el("authMsg").innerText = "";
+        el("authMsg").className = "text-sm text-slate-600 mt-4";
+        el("authMsg").innerText = "Sedang login...";
+        el("authButton").disabled = true;
+        el("authButton").innerText = "Memproses...";
         const email = el("authEmail").value.trim(), password = el("authPassword").value.trim();
-        if (!email || !password) return el("authMsg").innerText = "Email dan password wajib diisi.";
+        if (!email || !password) {
+          el("authMsg").className = "text-sm text-red-600 mt-4";
+          el("authMsg").innerText = "Email dan password wajib diisi.";
+          return;
+        }
         await signInWithEmailAndPassword(auth, email, password);
-      } catch (err) { el("authMsg").innerText = err.message; }
+        el("authMsg").innerText = "Login berhasil, membuka dashboard...";
+      } catch (err) {
+        console.error(err);
+        el("authMsg").className = "text-sm text-red-600 mt-4";
+        if (err.code === "auth/invalid-credential") {
+          el("authMsg").innerText = "Email/password salah, atau akun belum terdaftar di Firebase iot-xtron.";
+        } else {
+          el("authMsg").innerText = err.message;
+        }
+      } finally {
+        el("authButton").disabled = false;
+        el("authButton").innerText = authMode === "register" ? "Buat Akun" : "Login";
+      }
     };
 
     window.logout = async function () { await signOut(auth); location.href = location.pathname; };
@@ -337,8 +356,17 @@
       el("bioText").value = currentProfile.bioText || "";
       el("businessCategory").value = currentProfile.businessCategory || "UMKM";
       el("themeColor").value = currentProfile.themeColor || "orange";
-      await loadLinks(uid); await loadProducts(uid); await loadClicks(uid);
-      renderDashboard(); showDashboard();
+      try { await loadLinks(uid); } catch (err) { console.warn("loadLinks gagal", err); currentLinks = []; }
+      try { await loadProducts(uid); } catch (err) { console.warn("loadProducts gagal", err); currentProducts = []; }
+      try { await loadClicks(uid); } catch (err) { console.warn("loadClicks gagal", err); currentClicks = []; }
+
+      showDashboard();
+      try {
+        renderDashboard();
+      } catch (err) {
+        console.error("renderDashboard gagal", err);
+        modal("Dashboard Error", "Dashboard sudah masuk, tapi ada komponen yang gagal dirender: " + err.message);
+      }
     }
     async function loadLinks(uid) { currentLinks = []; const snap = await getDocs(query(collection(db, "users", uid, "links"), orderBy("createdAt", "asc"))); snap.forEach(d => currentLinks.push({ id: d.id, ...d.data() })); }
     async function loadProducts(uid) { currentProducts = []; const snap = await getDocs(query(collection(db, "users", uid, "products"), orderBy("createdAt", "asc"))); snap.forEach(d => currentProducts.push({ id: d.id, ...d.data() })); }
@@ -355,7 +383,16 @@
       if (currentUser && ADMIN_EMAILS.includes(currentUser.email)) el("adminBtn").classList.remove("hide"); else el("adminBtn").classList.add("hide");
       const publicUrl = getPublicLink(currentProfile.slug); el("publicLinkText").innerText = publicUrl; generateQr(publicUrl); renderLinksList(); renderProductsList(); renderPreview();
     }
-    function generateQr(url) { QRCode.toCanvas(el("qrCanvas"), url, { width: 210, margin: 2 }, err => { if (err) console.error(err); }); }
+    function generateQr(url) {
+      const canvas = el("qrCanvas");
+      if (!canvas) return;
+      if (typeof QRCode === "undefined") {
+        const parent = canvas.parentElement;
+        if (parent) parent.innerHTML = `<div class="text-sm text-slate-500 text-center p-4">QR Code belum tampil karena library QR gagal dimuat. Link publik tetap bisa dicopy.</div>`;
+        return;
+      }
+      QRCode.toCanvas(canvas, url, { width: 210, margin: 2 }, err => { if (err) console.error(err); });
+    }
 
     function renderLinksList() {
       const box = el("linksList"); box.innerHTML = "";
@@ -441,9 +478,24 @@
     window.adminUpdateUser = async function (uid) { const plan = el(`plan-${uid}`).value, status = el(`status-${uid}`).value; await updateDoc(doc(db, "users", uid), { plan, status, updatedAt: serverTimestamp() }); modal("Berhasil", "Paket/status user berhasil diperbarui."); await loadAdminUsers(); };
 
     onAuthStateChanged(auth, async user => {
-      const publicSlug = new URLSearchParams(location.search).get("u");
-      if (publicSlug) return await loadPublicPage(publicSlug);
-      if (user) { currentUser = user; await loadDashboard(user.uid); } else currentUser = null;
+      try {
+        const publicSlug = new URLSearchParams(location.search).get("u");
+        if (publicSlug) return await loadPublicPage(publicSlug);
+        if (user) {
+          currentUser = user;
+          await loadDashboard(user.uid);
+        } else {
+          currentUser = null;
+        }
+      } catch (err) {
+        console.error("Auth state gagal", err);
+        showOnly("authPage");
+        el("authTitle").innerText = "Login";
+        el("nameField").classList.add("hide");
+        el("authMsg").className = "text-sm text-red-600 mt-4";
+        el("authMsg").innerText = "Gagal membuka dashboard: " + err.message;
+        modal("Gagal Masuk", err.message);
+      }
     });
   </script>
 </body>
