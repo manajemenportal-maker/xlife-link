@@ -164,7 +164,7 @@
           <h3 class="font-black text-2xl">QR Code Promosi</h3>
           <p class="text-slate-500 text-sm mt-1">QR ini bisa dipakai untuk brosur, kartu nama, stiker toko, dan katalog cetak.</p>
           <div class="flex flex-col md:flex-row gap-5 items-center mt-5">
-            <div class="bg-slate-50 rounded-3xl p-5 border"><canvas id="qrCanvas"></canvas></div>
+            <div class="bg-slate-50 rounded-3xl p-5 border text-center"><img id="qrImg" alt="QR Code Link Publik" class="w-[210px] h-[210px] mx-auto rounded-xl bg-white p-2" /><a id="qrDownload" href="#" target="_blank" class="inline-block mt-3 text-sm font-bold text-orange-600">Buka/Download QR</a></div>
             <div class="flex-1"><p id="publicLinkText" class="text-sm bg-slate-50 rounded-xl p-3 break-all border"></p><button onclick="copyPublicLink()" class="mt-3 px-5 py-3 rounded-2xl bg-slate-900 text-white font-black">Copy Link Publik</button></div>
           </div>
         </div>
@@ -384,14 +384,16 @@
       const publicUrl = getPublicLink(currentProfile.slug); el("publicLinkText").innerText = publicUrl; generateQr(publicUrl); renderLinksList(); renderProductsList(); renderPreview();
     }
     function generateQr(url) {
-      const canvas = el("qrCanvas");
-      if (!canvas) return;
-      if (typeof QRCode === "undefined") {
-        const parent = canvas.parentElement;
-        if (parent) parent.innerHTML = `<div class="text-sm text-slate-500 text-center p-4">QR Code belum tampil karena library QR gagal dimuat. Link publik tetap bisa dicopy.</div>`;
-        return;
-      }
-      QRCode.toCanvas(canvas, url, { width: 210, margin: 2 }, err => { if (err) console.error(err); });
+      const img = el("qrImg");
+      const link = el("qrDownload");
+      if (!img) return;
+      const qrUrl = "https://api.qrserver.com/v1/create-qr-code/?size=420x420&margin=18&data=" + encodeURIComponent(url);
+      img.src = qrUrl;
+      img.onerror = function () {
+        img.alt = "QR gagal dimuat";
+        img.outerHTML = `<div class="text-sm text-slate-500 text-center p-4">QR Code gagal dimuat dari server QR. Link publik tetap bisa dicopy.</div>`;
+      };
+      if (link) link.href = qrUrl;
     }
 
     function renderLinksList() {
