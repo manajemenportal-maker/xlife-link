@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>XLink Store - Link Bio, Katalog & Mini Toko Digital</title>
+  <meta name="description" content="Buat satu link untuk semua promosi bisnis: WhatsApp, katalog, produk, marketplace, QR Code, dan mini toko digital." />
+
+  <meta property="og:title" content="XLink Store - Satu Link Untuk Semua Bisnis" />
+  <meta property="og:description" content="Link bio, katalog digital, mini toko, QR Code, dan order WhatsApp dalam satu halaman." />
+  <meta property="og:image" content="https://dummyimage.com/1200x630/ff5a00/ffffff&text=XLink+Store" />
+  <meta property="og:type" content="website" />
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+
+  <style>
+    body { font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #fff7ed; }
+    .hide { display: none !important; }
+    .btn-main { background: linear-gradient(135deg, #ff5a00, #ff8a00); color: #fff; }
+    .btn-dark { background: linear-gradient(135deg, #020617, #1e293b); color: #fff; }
+    .glass { background: rgba(255,255,255,.88); backdrop-filter: blur(18px); }
+    .phone-frame { max-width: 430px; margin: auto; border-radius: 34px; overflow: hidden; box-shadow: 0 30px 80px rgba(0,0,0,.18); border: 8px solid #111827; background: white; }
+    .public-bg-orange { background: radial-gradient(circle at top left, rgba(255,122,0,.22), transparent 30%), radial-gradient(circle at bottom right, rgba(234,88,12,.16), transparent 35%), #fff7ed; }
+    .public-bg-blue { background: radial-gradient(circle at top left, rgba(37,99,235,.18), transparent 30%), radial-gradient(circle at bottom right, rgba(14,165,233,.14), transparent 35%), #eff6ff; }
+    .public-bg-green { background: radial-gradient(circle at top left, rgba(22,163,74,.18), transparent 30%), radial-gradient(circle at bottom right, rgba(34,197,94,.14), transparent 35%), #f0fdf4; }
+    .public-bg-dark { background: radial-gradient(circle at top left, rgba(255,255,255,.12), transparent 30%), radial-gradient(circle at bottom right, rgba(148,163,184,.12), transparent 35%), #020617; color: white; }
+    .public-bg-elegant { background: radial-gradient(circle at top left, rgba(168,85,247,.18), transparent 30%), radial-gradient(circle at bottom right, rgba(236,72,153,.15), transparent 35%), #faf5ff; }
+    .soft-card { background: rgba(255,255,255,.9); border: 1px solid rgba(15,23,42,.08); }
+    .dark-card { background: rgba(15,23,42,.86); border: 1px solid rgba(255,255,255,.12); color: white; }
+    .modal-bg { background: rgba(15,23,42,.72); }
+  </style>
+</head>
+
+<body class="min-h-screen text-slate-900">
+
+  <section id="landingPage" class="min-h-screen">
+    <nav class="max-w-7xl mx-auto px-5 py-5 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-11 h-11 rounded-2xl btn-main flex items-center justify-center font-black text-xl">X</div>
+        <div>
+          <h1 class="font-black text-xl leading-none">XLink Store</h1>
+          <p class="text-xs text-slate-500">Link Bio • Katalog • Mini Toko</p>
+        </div>
+      </div>
+      <div class="flex gap-2">
+        <button onclick="showLogin()" class="px-4 py-2 rounded-xl bg-white border text-sm font-bold">Login</button>
+        <button onclick="showRegister()" class="px-4 py-2 rounded-xl btn-main text-sm font-bold">Coba Gratis</button>
+      </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto px-5 py-10 grid lg:grid-cols-2 gap-10 items-center">
+      <div>
+        <div class="inline-flex px-4 py-2 rounded-full bg-orange-100 text-orange-700 text-sm font-bold mb-5">Platform link bio bisnis versi Indonesia</div>
+        <h2 class="text-4xl md:text-6xl font-black leading-tight">Satu Link Untuk Jualan, Katalog, WhatsApp, dan Promosi</h2>
+        <p class="text-lg text-slate-600 mt-5 max-w-xl">Bukan cuma link bio. Ini mini bisnis online: katalog produk, tombol order WhatsApp, QR Code, statistik klik, dan halaman publik yang siap dibagikan ke semua sosial media.</p>
+        <div class="flex flex-col sm:flex-row gap-3 mt-7">
+          <button onclick="showRegister()" class="px-7 py-4 rounded-2xl btn-main font-black shadow-lg shadow-orange-200">Buat Link Gratis</button>
+          <button onclick="scrollToPricing()" class="px-7 py-4 rounded-2xl bg-white border border-orange-200 font-black">Lihat Paket</button>
+        </div>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mt-8 max-w-2xl">
+          <div class="bg-white rounded-2xl p-4 border"><b class="text-2xl">QR</b><p class="text-xs text-slate-500">Code otomatis</p></div>
+          <div class="bg-white rounded-2xl p-4 border"><b class="text-2xl">WA</b><p class="text-xs text-slate-500">Order cepat</p></div>
+          <div class="bg-white rounded-2xl p-4 border"><b class="text-2xl">Klik</b><p class="text-xs text-slate-500">Statistik</p></div>
+          <div class="bg-white rounded-2xl p-4 border"><b class="text-2xl">Toko</b><p class="text-xs text-slate-500">Mini katalog</p></div>
+        </div>
+      </div>
+
+      <div class="phone-frame">
+        <div class="public-bg-orange p-5 min-h-[680px]">
+          <div class="text-center pt-6">
+            <div class="w-24 h-24 rounded-full btn-main mx-auto flex items-center justify-center text-white text-4xl font-black">K</div>
+            <h3 class="text-2xl font-black mt-4">Kalimaja Store</h3>
+            <p class="text-slate-600 text-sm mt-1">Supplier Alsintan, Pompa & Aplikasi Bisnis</p>
+          </div>
+          <div class="mt-7 space-y-3">
+            <div class="bg-white rounded-2xl p-4 shadow-sm font-bold text-center">💬 WhatsApp Admin</div>
+            <div class="bg-white rounded-2xl p-4 shadow-sm font-bold text-center">🚜 Katalog Traktor</div>
+            <div class="bg-white rounded-2xl p-4 shadow-sm font-bold text-center">🛒 Produk Digital</div>
+            <div class="bg-white rounded-2xl p-4 shadow-sm font-bold text-center">🌐 Website Utama</div>
+          </div>
+          <div class="mt-7 grid grid-cols-2 gap-3">
+            <div class="bg-white rounded-2xl p-3 shadow-sm"><div class="h-24 rounded-xl bg-orange-100 flex items-center justify-center text-4xl">📘</div><b class="block mt-2 text-sm">Template Invoice</b><p class="text-orange-600 font-black">Rp 49.000</p></div>
+            <div class="bg-white rounded-2xl p-3 shadow-sm"><div class="h-24 rounded-xl bg-orange-100 flex items-center justify-center text-4xl">📦</div><b class="block mt-2 text-sm">Paket Website</b><p class="text-orange-600 font-black">Rp 299.000</p></div>
+          </div>
+          <div class="bg-white rounded-2xl p-4 mt-5 text-center"><div class="text-5xl">▣</div><p class="text-sm font-bold mt-1">QR Code siap promosi</p></div>
+        </div>
+      </div>
+    </main>
+
+    <section class="max-w-7xl mx-auto px-5 py-12">
+      <div class="grid md:grid-cols-3 gap-5">
+        <div class="bg-white rounded-3xl p-6 border"><h3 class="font-black text-xl">Untuk UMKM</h3><p class="text-slate-600 mt-2">Jualan makanan, fashion, spare part, jasa, kursus, dan produk digital.</p></div>
+        <div class="bg-white rounded-3xl p-6 border"><h3 class="font-black text-xl">Untuk Teknisi & Jasa</h3><p class="text-slate-600 mt-2">Service AC, bengkel, karoseri, kontraktor, konsultan, dan freelancer.</p></div>
+        <div class="bg-white rounded-3xl p-6 border"><h3 class="font-black text-xl">Untuk Perusahaan</h3><p class="text-slate-600 mt-2">Profil cepat, katalog PDF, kontak sales, maps kantor, dan link penawaran.</p></div>
+      </div>
+    </section>
+
+    <section id="pricing" class="max-w-7xl mx-auto px-5 py-16">
+      <h2 class="text-3xl md:text-5xl font-black text-center">Paket Harga</h2>
+      <p class="text-center text-slate-600 mt-3">Bisa dijual bulanan, cocok untuk SaaS kecil.</p>
+      <div class="grid md:grid-cols-4 gap-4 mt-10">
+        <div class="bg-white rounded-3xl p-6 border"><h3 class="font-black text-xl">Free</h3><p class="text-3xl font-black mt-3">Rp 0</p><p class="text-sm text-slate-500">Trial promosi</p><ul class="text-sm mt-5 space-y-2"><li>✓ 3 link</li><li>✓ 2 produk</li><li>✓ QR Code</li></ul></div>
+        <div class="bg-white rounded-3xl p-6 border border-orange-300 shadow-xl shadow-orange-100"><h3 class="font-black text-xl">Starter</h3><p class="text-3xl font-black mt-3">Rp 25.000</p><p class="text-sm text-slate-500">per bulan</p><ul class="text-sm mt-5 space-y-2"><li>✓ 10 link</li><li>✓ 10 produk</li><li>✓ Statistik klik</li></ul></div>
+        <div class="bg-white rounded-3xl p-6 border"><h3 class="font-black text-xl">Business</h3><p class="text-3xl font-black mt-3">Rp 75.000</p><p class="text-sm text-slate-500">per bulan</p><ul class="text-sm mt-5 space-y-2"><li>✓ 30 link</li><li>✓ 50 produk</li><li>✓ Katalog bisnis</li></ul></div>
+        <div class="bg-white rounded-3xl p-6 border"><h3 class="font-black text-xl">Pro</h3><p class="text-3xl font-black mt-3">Rp 150.000</p><p class="text-sm text-slate-500">per bulan</p><ul class="text-sm mt-5 space-y-2"><li>✓ Unlimited link</li><li>✓ 200 produk</li><li>✓ Prioritas support</li></ul></div>
+      </div>
+    </section>
+  </section>
+
+  <section id="authPage" class="hide min-h-screen flex items-center justify-center px-5 py-10">
+    <div class="w-full max-w-md glass rounded-3xl p-7 shadow-2xl">
+      <button onclick="backHome()" class="text-sm text-slate-500 mb-4">← Kembali</button>
+      <h2 id="authTitle" class="text-3xl font-black">Login</h2>
+      <p class="text-slate-500 mt-1">Masuk ke dashboard XLink Store.</p>
+      <div id="nameField" class="hide mt-5"><label class="text-sm font-bold">Nama Bisnis</label><input id="regBusinessName" class="w-full mt-1 px-4 py-3 rounded-xl border" placeholder="Contoh: Kalimaja Store" /></div>
+      <div class="mt-4"><label class="text-sm font-bold">Email</label><input id="authEmail" type="email" class="w-full mt-1 px-4 py-3 rounded-xl border" placeholder="email@domain.com" /></div>
+      <div class="mt-4"><label class="text-sm font-bold">Password</label><input id="authPassword" type="password" class="w-full mt-1 px-4 py-3 rounded-xl border" placeholder="Minimal 6 karakter" /></div>
+      <button id="authButton" onclick="doLogin()" class="w-full btn-main rounded-2xl py-4 font-black mt-6">Login</button>
+      <p id="switchAuth" class="text-center text-sm mt-5">Belum punya akun? <button onclick="showRegister()" class="font-bold text-orange-600">Daftar</button></p>
+      <p id="authMsg" class="text-sm text-red-600 mt-4"></p>
+    </div>
+  </section>
+
+  <section id="dashboardPage" class="hide min-h-screen">
+    <header class="bg-white border-b sticky top-0 z-20">
+      <div class="max-w-7xl mx-auto px-5 py-4 flex items-center justify-between gap-3">
+        <div><h2 class="font-black text-xl">Dashboard XLink Store</h2><p id="userPlanText" class="text-xs text-slate-500">Plan: Free</p></div>
+        <div class="flex flex-wrap gap-2 justify-end">
+          <button id="adminBtn" onclick="showAdminPanel()" class="hide px-4 py-2 rounded-xl bg-purple-600 text-white text-sm font-bold">Admin</button>
+          <button onclick="copyPublicLink()" class="px-4 py-2 rounded-xl bg-slate-100 text-sm font-bold">Copy Link</button>
+          <button onclick="openPublicPage()" class="px-4 py-2 rounded-xl btn-main text-sm font-bold">Lihat Link</button>
+          <button onclick="logout()" class="px-4 py-2 rounded-xl bg-slate-900 text-white text-sm font-bold">Logout</button>
+        </div>
+      </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto p-5 grid lg:grid-cols-3 gap-5">
+      <div class="lg:col-span-2 space-y-5">
+        <div class="grid md:grid-cols-4 gap-3">
+          <div class="bg-white rounded-3xl p-5 border"><p class="text-xs text-slate-500">Total Klik</p><b id="statTotalClicks" class="text-3xl">0</b></div>
+          <div class="bg-white rounded-3xl p-5 border"><p class="text-xs text-slate-500">Link</p><b id="statLinks" class="text-3xl">0</b></div>
+          <div class="bg-white rounded-3xl p-5 border"><p class="text-xs text-slate-500">Produk</p><b id="statProducts" class="text-3xl">0</b></div>
+          <div class="bg-white rounded-3xl p-5 border"><p class="text-xs text-slate-500">Status</p><b id="statStatus" class="text-xl">Aktif</b></div>
+        </div>
+
+        <div class="bg-white rounded-3xl p-6 border">
+          <h3 class="font-black text-2xl">Profil Halaman</h3>
+          <div class="grid md:grid-cols-2 gap-4 mt-5">
+            <div><label class="text-sm font-bold">Nama Bisnis</label><input id="businessName" class="w-full mt-1 px-4 py-3 rounded-xl border" /></div>
+            <div><label class="text-sm font-bold">Slug Link</label><input id="slug" class="w-full mt-1 px-4 py-3 rounded-xl border" placeholder="kalimaja-store" /><p class="text-xs text-slate-500 mt-1">Contoh: index.html?u=kalimaja-store</p></div>
+            <div><label class="text-sm font-bold">Nomor WhatsApp</label><input id="whatsapp" class="w-full mt-1 px-4 py-3 rounded-xl border" placeholder="6285111033789" /></div>
+            <div><label class="text-sm font-bold">Template Tampilan</label><select id="themeColor" class="w-full mt-1 px-4 py-3 rounded-xl border"><option value="orange">Orange Enerjik</option><option value="blue">Biru Profesional</option><option value="green">Hijau Natural</option><option value="dark">Dark Premium</option><option value="elegant">Elegant Purple</option></select></div>
+            <div><label class="text-sm font-bold">Kategori Bisnis</label><select id="businessCategory" class="w-full mt-1 px-4 py-3 rounded-xl border"><option value="UMKM">UMKM</option><option value="Jasa">Jasa</option><option value="Toko Online">Toko Online</option><option value="Produk Digital">Produk Digital</option><option value="Perusahaan">Perusahaan</option><option value="Teknisi">Teknisi</option><option value="Konsultan">Konsultan</option></select></div>
+            <div><label class="text-sm font-bold">Headline Promosi</label><input id="headline" class="w-full mt-1 px-4 py-3 rounded-xl border" placeholder="Contoh: Semua kebutuhan bisnis dalam satu link" /></div>
+          </div>
+          <div class="mt-4"><label class="text-sm font-bold">Deskripsi Singkat</label><textarea id="bioText" class="w-full mt-1 px-4 py-3 rounded-xl border" rows="3"></textarea></div>
+          <button onclick="saveProfile()" class="btn-main px-6 py-3 rounded-2xl font-black mt-5">Simpan Profil</button>
+          <p id="profileMsg" class="text-sm mt-3"></p>
+        </div>
+
+        <div class="bg-white rounded-3xl p-6 border">
+          <h3 class="font-black text-2xl">QR Code Promosi</h3>
+          <p class="text-slate-500 text-sm mt-1">QR ini bisa dipakai untuk brosur, kartu nama, stiker toko, dan katalog cetak.</p>
+          <div class="flex flex-col md:flex-row gap-5 items-center mt-5">
+            <div class="bg-slate-50 rounded-3xl p-5 border"><canvas id="qrCanvas"></canvas></div>
+            <div class="flex-1"><p id="publicLinkText" class="text-sm bg-slate-50 rounded-xl p-3 break-all border"></p><button onclick="copyPublicLink()" class="mt-3 px-5 py-3 rounded-2xl bg-slate-900 text-white font-black">Copy Link Publik</button></div>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-3xl p-6 border">
+          <div class="flex items-center justify-between gap-3"><h3 class="font-black text-2xl">Tombol Link</h3><span id="linkLimitText" class="text-xs bg-orange-100 text-orange-700 px-3 py-1 rounded-full font-bold">0/3</span></div>
+          <div class="grid md:grid-cols-4 gap-3 mt-5"><input id="linkTitle" class="px-4 py-3 rounded-xl border" placeholder="Judul tombol" /><select id="linkType" class="px-4 py-3 rounded-xl border"><option value="general">Umum</option><option value="whatsapp">WhatsApp</option><option value="marketplace">Marketplace</option><option value="maps">Google Maps</option><option value="pdf">PDF/Katalog</option><option value="social">Sosial Media</option></select><input id="linkUrl" class="px-4 py-3 rounded-xl border md:col-span-2" placeholder="https:// atau https://wa.me/..." /></div>
+          <button onclick="addLink()" class="mt-3 px-5 py-3 rounded-2xl bg-slate-900 text-white font-black">Tambah Link</button>
+          <div id="linksList" class="mt-5 space-y-3"></div>
+        </div>
+
+        <div class="bg-white rounded-3xl p-6 border">
+          <div class="flex items-center justify-between gap-3"><h3 class="font-black text-2xl">Produk / Jasa</h3><span id="productLimitText" class="text-xs bg-orange-100 text-orange-700 px-3 py-1 rounded-full font-bold">0/2</span></div>
+          <div class="grid md:grid-cols-2 gap-3 mt-5"><input id="productName" class="px-4 py-3 rounded-xl border" placeholder="Nama produk" /><input id="productPrice" class="px-4 py-3 rounded-xl border" placeholder="Harga, contoh: Rp 49.000" /><input id="productImage" class="px-4 py-3 rounded-xl border md:col-span-2" placeholder="URL gambar produk, boleh kosong" /><textarea id="productDesc" class="px-4 py-3 rounded-xl border md:col-span-2" placeholder="Deskripsi produk" rows="2"></textarea></div>
+          <button onclick="addProduct()" class="mt-3 px-5 py-3 rounded-2xl bg-slate-900 text-white font-black">Tambah Produk</button>
+          <div id="productsList" class="mt-5 grid md:grid-cols-2 gap-3"></div>
+        </div>
+      </div>
+
+      <aside><div class="sticky top-24"><h3 class="font-black text-xl mb-3">Preview HP</h3><div class="phone-frame"><div id="previewBox" class="p-5 min-h-[650px]"></div></div></div></aside>
+    </main>
+  </section>
+
+  <section id="adminPage" class="hide min-h-screen bg-slate-100">
+    <header class="bg-white border-b sticky top-0 z-20"><div class="max-w-7xl mx-auto px-5 py-4 flex items-center justify-between"><div><h2 class="font-black text-xl">Admin Pusat XLink Store</h2><p class="text-xs text-slate-500">Kelola user, paket, dan status akun.</p></div><button onclick="showDashboard()" class="px-4 py-2 rounded-xl bg-slate-900 text-white text-sm font-bold">Dashboard</button></div></header>
+    <main class="max-w-7xl mx-auto p-5">
+      <div class="grid md:grid-cols-4 gap-3 mb-5">
+        <div class="bg-white rounded-3xl p-5 border"><p class="text-xs text-slate-500">Total User</p><b id="adminTotalUsers" class="text-3xl">0</b></div>
+        <div class="bg-white rounded-3xl p-5 border"><p class="text-xs text-slate-500">Free</p><b id="adminFreeUsers" class="text-3xl">0</b></div>
+        <div class="bg-white rounded-3xl p-5 border"><p class="text-xs text-slate-500">Berbayar</p><b id="adminPaidUsers" class="text-3xl">0</b></div>
+        <div class="bg-white rounded-3xl p-5 border"><p class="text-xs text-slate-500">Aktif</p><b id="adminActiveUsers" class="text-3xl">0</b></div>
+      </div>
+      <div class="bg-white rounded-3xl p-5 border"><h3 class="font-black text-2xl mb-4">Daftar User</h3><div id="adminUsersList" class="space-y-3"></div></div>
+    </main>
+  </section>
+
+  <section id="publicPage" class="hide min-h-screen px-5 py-8"><div class="max-w-md mx-auto"><div id="publicContent"></div></div></section>
+
+  <div id="modal" class="hide fixed inset-0 z-50 modal-bg flex items-center justify-center p-5"><div class="bg-white rounded-3xl p-6 max-w-md w-full"><h3 id="modalTitle" class="font-black text-2xl">Info</h3><p id="modalText" class="text-slate-600 mt-2"></p><button onclick="closeModal()" class="btn-main w-full py-3 rounded-2xl font-black mt-5">OK</button></div></div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
+    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
+    import { getFirestore, doc, setDoc, getDoc, collection, addDoc, getDocs, deleteDoc, query, serverTimestamp, orderBy, updateDoc, increment } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBY0d7PEX_YwUbZZc_2D9F3I1pZ_fQj40M",
+      authDomain: "iot-xtron.firebaseapp.com",
+      projectId: "iot-xtron",
+      storageBucket: "iot-xtron.firebasestorage.app",
+      messagingSenderId: "651113774703",
+      appId: "1:651113774703:web:87254d673d28b7f3b2d79a",
+      measurementId: "G-GKS00T53K5"
+    };
+
+    const ADMIN_EMAILS = ["kalimayasuryaalam@gmail.com", "kalimajasuryaalam@gmail.com"];
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    let currentUser = null, currentProfile = null, currentLinks = [], currentProducts = [], currentClicks = [];
+    const limits = { free: { links: 3, products: 2 }, starter: { links: 10, products: 10 }, business: { links: 30, products: 50 }, pro: { links: 999, products: 200 } };
+
+    function el(id) { return document.getElementById(id); }
+    function showOnly(pageId) { ["landingPage", "authPage", "dashboardPage", "adminPage", "publicPage"].forEach(id => el(id).classList.add("hide")); el(pageId).classList.remove("hide"); }
+    function modal(title, text) { el("modalTitle").innerText = title; el("modalText").innerText = text; el("modal").classList.remove("hide"); }
+    window.closeModal = () => el("modal").classList.add("hide");
+    function slugify(text) { return String(text || "").toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, ""); }
+    function cleanPhone(phone) { let p = String(phone || "").replace(/\D/g, ""); if (p.startsWith("0")) p = "62" + p.slice(1); return p; }
+    function moneyText(text) { return text || "Hubungi Admin"; }
+    function getBaseUrl() { return location.origin + location.pathname; }
+    function getPublicLink(slug) { return `${getBaseUrl()}?u=${encodeURIComponent(slug || "")}`; }
+    function encodeText(text) { return String(text || "").replace(/'/g, "\\'").replace(/"/g, "&quot;"); }
+
+    function getTheme(profile) {
+      const map = {
+        orange: { page: "public-bg-orange", btn: "bg-orange-600", text: "text-orange-600", soft: "bg-orange-50", card: "soft-card", dark: false },
+        blue: { page: "public-bg-blue", btn: "bg-blue-600", text: "text-blue-600", soft: "bg-blue-50", card: "soft-card", dark: false },
+        green: { page: "public-bg-green", btn: "bg-green-600", text: "text-green-600", soft: "bg-green-50", card: "soft-card", dark: false },
+        dark: { page: "public-bg-dark", btn: "bg-slate-950", text: "text-white", soft: "bg-slate-800", card: "dark-card", dark: true },
+        elegant: { page: "public-bg-elegant", btn: "bg-purple-600", text: "text-purple-600", soft: "bg-purple-50", card: "soft-card", dark: false }
+      };
+      return map[profile?.themeColor || "orange"] || map.orange;
+    }
+    function iconByType(type) { return ({ whatsapp: "💬", marketplace: "🛒", maps: "📍", pdf: "📄", social: "📣", general: "🔗" }[type] || "🔗"); }
+
+    window.showLogin = function () { showOnly("authPage"); el("authTitle").innerText = "Login"; el("nameField").classList.add("hide"); el("authButton").innerText = "Login"; el("authButton").setAttribute("onclick", "doLogin()"); el("switchAuth").innerHTML = `Belum punya akun? <button onclick="showRegister()" class="font-bold text-orange-600">Daftar</button>`; el("authMsg").innerText = ""; };
+    window.showRegister = function () { showOnly("authPage"); el("authTitle").innerText = "Daftar Gratis"; el("nameField").classList.remove("hide"); el("authButton").innerText = "Buat Akun"; el("authButton").setAttribute("onclick", "doRegister()"); el("switchAuth").innerHTML = `Sudah punya akun? <button onclick="showLogin()" class="font-bold text-orange-600">Login</button>`; el("authMsg").innerText = ""; };
+    window.backHome = () => showOnly("landingPage");
+    window.scrollToPricing = () => el("pricing").scrollIntoView({ behavior: "smooth" });
+
+    window.doRegister = async function () {
+      try {
+        el("authMsg").innerText = "";
+        const email = el("authEmail").value.trim(), password = el("authPassword").value.trim(), name = el("regBusinessName").value.trim();
+        if (!name || !email || !password) return el("authMsg").innerText = "Nama bisnis, email, dan password wajib diisi.";
+        const cred = await createUserWithEmailAndPassword(auth, email, password);
+        const uid = cred.user.uid;
+        let slug = slugify(name) || "user-" + uid.slice(0, 6);
+        const slugSnap = await getDoc(doc(db, "slugs", slug));
+        if (slugSnap.exists()) slug = slug + "-" + uid.slice(0, 5);
+        await setDoc(doc(db, "users", uid), { uid, email, businessName: name, slug, whatsapp: "", headline: "Semua informasi bisnis dalam satu link.", bioText: "Selamat datang di halaman resmi kami.", businessCategory: "UMKM", themeColor: "orange", plan: "free", status: "active", totalClicks: 0, createdAt: serverTimestamp(), updatedAt: serverTimestamp() });
+        await setDoc(doc(db, "slugs", slug), { uid, slug, createdAt: serverTimestamp() });
+      } catch (err) { el("authMsg").innerText = err.message; }
+    };
+
+    window.doLogin = async function () {
+      try {
+        el("authMsg").innerText = "";
+        const email = el("authEmail").value.trim(), password = el("authPassword").value.trim();
+        if (!email || !password) return el("authMsg").innerText = "Email dan password wajib diisi.";
+        await signInWithEmailAndPassword(auth, email, password);
+      } catch (err) { el("authMsg").innerText = err.message; }
+    };
+
+    window.logout = async function () { await signOut(auth); location.href = location.pathname; };
+
+    async function loadDashboard(uid) {
+      const snap = await getDoc(doc(db, "users", uid));
+      if (!snap.exists()) return modal("Profil belum ditemukan", "Akun ada, tapi dokumen user belum tersedia.");
+      currentProfile = snap.data();
+      el("businessName").value = currentProfile.businessName || "";
+      el("slug").value = currentProfile.slug || "";
+      el("whatsapp").value = currentProfile.whatsapp || "";
+      el("headline").value = currentProfile.headline || "";
+      el("bioText").value = currentProfile.bioText || "";
+      el("businessCategory").value = currentProfile.businessCategory || "UMKM";
+      el("themeColor").value = currentProfile.themeColor || "orange";
+      await loadLinks(uid); await loadProducts(uid); await loadClicks(uid);
+      renderDashboard(); showDashboard();
+    }
+    async function loadLinks(uid) { currentLinks = []; const snap = await getDocs(query(collection(db, "users", uid, "links"), orderBy("createdAt", "asc"))); snap.forEach(d => currentLinks.push({ id: d.id, ...d.data() })); }
+    async function loadProducts(uid) { currentProducts = []; const snap = await getDocs(query(collection(db, "users", uid, "products"), orderBy("createdAt", "asc"))); snap.forEach(d => currentProducts.push({ id: d.id, ...d.data() })); }
+    async function loadClicks(uid) { currentClicks = []; const snap = await getDocs(query(collection(db, "users", uid, "clicks"), orderBy("createdAt", "desc"))); snap.forEach(d => currentClicks.push({ id: d.id, ...d.data() })); }
+    window.showDashboard = () => showOnly("dashboardPage");
+
+    function renderDashboard() {
+      const plan = currentProfile.plan || "free", lim = limits[plan] || limits.free;
+      el("userPlanText").innerText = `Plan: ${plan.toUpperCase()} • Status: ${(currentProfile.status || "active").toUpperCase()}`;
+      el("linkLimitText").innerText = `${currentLinks.length}/${lim.links === 999 ? "Unlimited" : lim.links}`;
+      el("productLimitText").innerText = `${currentProducts.length}/${lim.products}`;
+      el("statTotalClicks").innerText = currentProfile.totalClicks || currentClicks.length || 0;
+      el("statLinks").innerText = currentLinks.length; el("statProducts").innerText = currentProducts.length; el("statStatus").innerText = currentProfile.status === "active" ? "Aktif" : "Nonaktif";
+      if (currentUser && ADMIN_EMAILS.includes(currentUser.email)) el("adminBtn").classList.remove("hide"); else el("adminBtn").classList.add("hide");
+      const publicUrl = getPublicLink(currentProfile.slug); el("publicLinkText").innerText = publicUrl; generateQr(publicUrl); renderLinksList(); renderProductsList(); renderPreview();
+    }
+    function generateQr(url) { QRCode.toCanvas(el("qrCanvas"), url, { width: 210, margin: 2 }, err => { if (err) console.error(err); }); }
+
+    function renderLinksList() {
+      const box = el("linksList"); box.innerHTML = "";
+      if (!currentLinks.length) return box.innerHTML = `<p class="text-sm text-slate-500">Belum ada link.</p>`;
+      currentLinks.forEach(item => { const div = document.createElement("div"); div.className = "flex items-center justify-between gap-3 bg-slate-50 rounded-2xl p-4"; div.innerHTML = `<div><b>${iconByType(item.type)} ${item.title || "-"}</b><p class="text-xs text-slate-500 break-all">${item.url || "-"}</p><p class="text-xs text-orange-600 font-bold mt-1">Klik: ${item.clicks || 0}</p></div><button class="text-red-600 font-bold text-sm" onclick="deleteLink('${item.id}')">Hapus</button>`; box.appendChild(div); });
+    }
+    function renderProductsList() {
+      const box = el("productsList"); box.innerHTML = "";
+      if (!currentProducts.length) return box.innerHTML = `<p class="text-sm text-slate-500">Belum ada produk.</p>`;
+      currentProducts.forEach(item => { const div = document.createElement("div"); div.className = "bg-slate-50 rounded-2xl p-4"; div.innerHTML = `<div class="h-32 rounded-xl bg-orange-100 overflow-hidden flex items-center justify-center">${item.image ? `<img src="${item.image}" class="w-full h-full object-cover">` : `<span class="text-4xl">📦</span>`}</div><b class="block mt-3">${item.name || "-"}</b><p class="text-orange-600 font-black">${moneyText(item.price)}</p><p class="text-sm text-slate-500 mt-1">${item.desc || ""}</p><p class="text-xs text-orange-600 font-bold mt-1">Klik: ${item.clicks || 0}</p><button class="text-red-600 font-bold text-sm mt-3" onclick="deleteProduct('${item.id}')">Hapus</button>`; box.appendChild(div); });
+    }
+    function renderPreview() { const theme = getTheme(currentProfile); el("previewBox").className = `p-5 min-h-[650px] ${theme.page}`; el("previewBox").innerHTML = buildPublicHtml(currentProfile, currentLinks, currentProducts, true); }
+
+    function buildPublicHtml(profile, links, products, isPreview = false) {
+      const theme = getTheme(profile), phone = cleanPhone(profile.whatsapp), waBase = phone ? `https://wa.me/${phone}` : "#", initials = (profile.businessName || "X").charAt(0).toUpperCase(), muted = theme.dark ? "text-slate-300" : "text-slate-600", cardClass = theme.card;
+      const linksHtml = links.map(l => `<a href="${isPreview ? "javascript:void(0)" : l.url || "#"}" ${isPreview ? "" : `onclick="trackClick('${profile.uid}', 'link', '${l.id}', '${encodeText(l.title || "Link")}')" target="_blank"`} class="block ${cardClass} rounded-2xl p-4 shadow-sm font-bold text-center">${iconByType(l.type)} ${l.title || "Link"}</a>`).join("");
+      const productsHtml = products.map(p => { const msg = encodeURIComponent(`Halo, saya mau tanya/order produk: ${p.name || ""}`); return `<div class="${cardClass} rounded-2xl p-3 shadow-sm"><div class="h-32 rounded-xl ${theme.soft} overflow-hidden flex items-center justify-center">${p.image ? `<img src="${p.image}" class="w-full h-full object-cover">` : `<span class="text-4xl">📦</span>`}</div><b class="block mt-3">${p.name || "-"}</b><p class="${theme.text} font-black">${moneyText(p.price)}</p><p class="text-sm ${muted} mt-1">${p.desc || ""}</p><a href="${isPreview ? "javascript:void(0)" : `${waBase}?text=${msg}`}" ${isPreview ? "" : `onclick="trackClick('${profile.uid}', 'product', '${p.id}', '${encodeText(p.name || "Produk")}')" target="_blank"`} class="block mt-3 ${theme.btn} text-white text-center rounded-xl py-2 font-black">Order</a></div>`; }).join("");
+      return `<div class="text-center pt-5"><div class="w-24 h-24 rounded-full ${theme.btn} mx-auto flex items-center justify-center text-white text-4xl font-black">${initials}</div><p class="text-xs ${muted} mt-4">${profile.businessCategory || "Bisnis"}</p><h1 class="text-2xl font-black mt-1">${profile.businessName || "Nama Bisnis"}</h1><h2 class="font-bold mt-2">${profile.headline || ""}</h2><p class="${muted} text-sm mt-2">${profile.bioText || ""}</p></div>${phone ? `<a href="${isPreview ? "javascript:void(0)" : waBase}" ${isPreview ? "" : `onclick="trackClick('${profile.uid}', 'whatsapp', 'main-wa', 'WhatsApp Utama')" target="_blank"`} class="block mt-6 ${theme.btn} text-white text-center rounded-2xl py-4 font-black shadow-lg">💬 WhatsApp Sekarang</a>` : ""}<div class="mt-5 space-y-3">${linksHtml || `<p class="text-center text-sm ${muted}">Belum ada link.</p>`}</div><h2 class="font-black text-xl mt-8 mb-3">Produk / Jasa</h2><div class="grid grid-cols-2 gap-3">${productsHtml || `<p class="text-sm ${muted} col-span-2">Belum ada produk.</p>`}</div><div class="${cardClass} rounded-2xl p-4 mt-6 text-center"><p class="text-xs ${muted}">Bagikan halaman ini</p><button onclick="${isPreview ? "" : "sharePublicPage()"}" class="mt-2 px-4 py-2 rounded-xl ${theme.btn} text-white font-bold text-sm">Share Link</button></div><p class="text-center text-xs ${theme.dark ? "text-slate-400" : "text-slate-400"} mt-8">Dibuat dengan XLink Store</p>`;
+    }
+
+    window.saveProfile = async function () {
+      try {
+        if (!currentUser) return;
+        const oldSlug = currentProfile.slug, newSlug = slugify(el("slug").value);
+        if (!newSlug) { el("profileMsg").className = "text-sm text-red-600 mt-3"; return el("profileMsg").innerText = "Slug tidak boleh kosong."; }
+        if (newSlug !== oldSlug) { const slugSnap = await getDoc(doc(db, "slugs", newSlug)); if (slugSnap.exists()) { el("profileMsg").className = "text-sm text-red-600 mt-3"; return el("profileMsg").innerText = "Slug sudah dipakai user lain."; } await deleteDoc(doc(db, "slugs", oldSlug)); await setDoc(doc(db, "slugs", newSlug), { uid: currentUser.uid, slug: newSlug, createdAt: serverTimestamp() }); }
+        const data = { businessName: el("businessName").value.trim(), slug: newSlug, whatsapp: cleanPhone(el("whatsapp").value), headline: el("headline").value.trim(), bioText: el("bioText").value.trim(), businessCategory: el("businessCategory").value, themeColor: el("themeColor").value, updatedAt: serverTimestamp() };
+        await setDoc(doc(db, "users", currentUser.uid), data, { merge: true });
+        currentProfile = { ...currentProfile, ...data }; renderDashboard(); el("profileMsg").className = "text-sm text-green-600 mt-3"; el("profileMsg").innerText = "Profil berhasil disimpan.";
+      } catch (err) { el("profileMsg").className = "text-sm text-red-600 mt-3"; el("profileMsg").innerText = err.message; }
+    };
+
+    window.addLink = async function () {
+      if (!currentUser) return;
+      const plan = currentProfile.plan || "free", lim = limits[plan] || limits.free;
+      if (currentLinks.length >= lim.links) return modal("Batas Paket", "Batas link paket Anda sudah penuh. Silakan upgrade paket.");
+      const title = el("linkTitle").value.trim(), url = el("linkUrl").value.trim(), type = el("linkType").value;
+      if (!title || !url) return modal("Data belum lengkap", "Judul dan URL wajib diisi.");
+      await addDoc(collection(db, "users", currentUser.uid, "links"), { title, url, type, clicks: 0, createdAt: serverTimestamp() });
+      el("linkTitle").value = ""; el("linkUrl").value = ""; el("linkType").value = "general"; await loadLinks(currentUser.uid); renderDashboard();
+    };
+    window.deleteLink = async id => { if (!currentUser) return; await deleteDoc(doc(db, "users", currentUser.uid, "links", id)); await loadLinks(currentUser.uid); renderDashboard(); };
+    window.addProduct = async function () {
+      if (!currentUser) return;
+      const plan = currentProfile.plan || "free", lim = limits[plan] || limits.free;
+      if (currentProducts.length >= lim.products) return modal("Batas Paket", "Batas produk paket Anda sudah penuh. Silakan upgrade paket.");
+      const name = el("productName").value.trim(), price = el("productPrice").value.trim(), image = el("productImage").value.trim(), desc = el("productDesc").value.trim();
+      if (!name) return modal("Data belum lengkap", "Nama produk wajib diisi.");
+      await addDoc(collection(db, "users", currentUser.uid, "products"), { name, price, image, desc, clicks: 0, createdAt: serverTimestamp() });
+      el("productName").value = ""; el("productPrice").value = ""; el("productImage").value = ""; el("productDesc").value = ""; await loadProducts(currentUser.uid); renderDashboard();
+    };
+    window.deleteProduct = async id => { if (!currentUser) return; await deleteDoc(doc(db, "users", currentUser.uid, "products", id)); await loadProducts(currentUser.uid); renderDashboard(); };
+    window.copyPublicLink = async function () { if (!currentProfile?.slug) return modal("Slug kosong", "Simpan profil dulu agar link publik aktif."); const url = getPublicLink(currentProfile.slug); try { await navigator.clipboard.writeText(url); modal("Link disalin", "Link publik sudah disalin. Siap dibagikan ke WhatsApp, Instagram, TikTok, dan Facebook."); } catch { modal("Link publik", url); } };
+    window.openPublicPage = () => { if (!currentProfile?.slug) return modal("Slug kosong", "Slug belum dibuat."); window.open(getPublicLink(currentProfile.slug), "_blank"); };
+
+    window.trackClick = async function (uid, type, targetId, title) {
+      try {
+        await addDoc(collection(db, "users", uid, "clicks"), { type, targetId, title, userAgent: navigator.userAgent, createdAt: serverTimestamp() });
+        await updateDoc(doc(db, "users", uid), { totalClicks: increment(1) });
+        if (type === "link") await updateDoc(doc(db, "users", uid, "links", targetId), { clicks: increment(1) });
+        if (type === "product") await updateDoc(doc(db, "users", uid, "products", targetId), { clicks: increment(1) });
+      } catch (err) { console.log("Track click error:", err.message); }
+    };
+    window.sharePublicPage = async function () { const url = location.href; if (navigator.share) await navigator.share({ title: document.title, text: "Cek halaman bisnis ini", url }); else { await navigator.clipboard.writeText(url); alert("Link berhasil disalin."); } };
+
+    async function loadPublicPage(slug) {
+      const slugSnap = await getDoc(doc(db, "slugs", slug)); if (!slugSnap.exists()) return showPublicError("Halaman tidak ditemukan.");
+      const uid = slugSnap.data().uid, userSnap = await getDoc(doc(db, "users", uid)); if (!userSnap.exists()) return showPublicError("Profil belum tersedia.");
+      const profile = userSnap.data(); if (profile.status !== "active") return showPublicError("Halaman sedang tidak aktif.");
+      const links = [], linkSnap = await getDocs(query(collection(db, "users", uid, "links"), orderBy("createdAt", "asc"))); linkSnap.forEach(d => links.push({ id: d.id, ...d.data() }));
+      const products = [], prodSnap = await getDocs(query(collection(db, "users", uid, "products"), orderBy("createdAt", "asc"))); prodSnap.forEach(d => products.push({ id: d.id, ...d.data() }));
+      const theme = getTheme(profile); el("publicPage").className = `min-h-screen px-5 py-8 ${theme.page}`; showOnly("publicPage"); el("publicContent").innerHTML = buildPublicHtml(profile, links, products, false); document.title = `${profile.businessName || "XLink Store"} - Link Bio`;
+    }
+    function showPublicError(msg) { showOnly("publicPage"); el("publicPage").className = "min-h-screen px-5 py-8 public-bg-orange"; el("publicContent").innerHTML = `<div class="bg-white rounded-3xl p-8 text-center shadow"><h1 class="font-black text-2xl">Oops</h1><p class="text-slate-500 mt-2">${msg}</p><a href="${location.pathname}" class="inline-block mt-5 btn-main px-5 py-3 rounded-2xl font-black">Kembali</a></div>`; }
+
+    window.showAdminPanel = async function () { if (!currentUser || !ADMIN_EMAILS.includes(currentUser.email)) return modal("Akses ditolak", "Hanya admin pusat yang bisa membuka halaman ini."); showOnly("adminPage"); await loadAdminUsers(); };
+    async function loadAdminUsers() {
+      const snap = await getDocs(collection(db, "users")), users = []; snap.forEach(d => users.push({ id: d.id, ...d.data() }));
+      el("adminTotalUsers").innerText = users.length; el("adminFreeUsers").innerText = users.filter(u => (u.plan || "free") === "free").length; el("adminPaidUsers").innerText = users.filter(u => (u.plan || "free") !== "free").length; el("adminActiveUsers").innerText = users.filter(u => (u.status || "active") === "active").length;
+      const box = el("adminUsersList"); box.innerHTML = ""; if (!users.length) return box.innerHTML = `<p class="text-sm text-slate-500">Belum ada user.</p>`;
+      users.forEach(u => { const div = document.createElement("div"); div.className = "bg-slate-50 rounded-2xl p-4 border"; div.innerHTML = `<div class="grid md:grid-cols-5 gap-3 items-center"><div class="md:col-span-2"><b>${u.businessName || "-"}</b><p class="text-xs text-slate-500">${u.email || "-"}</p><p class="text-xs text-orange-600 font-bold">${getPublicLink(u.slug)}</p></div><div><label class="text-xs font-bold">Plan</label><select id="plan-${u.uid}" class="w-full px-3 py-2 rounded-xl border"><option value="free" ${u.plan === "free" ? "selected" : ""}>Free</option><option value="starter" ${u.plan === "starter" ? "selected" : ""}>Starter</option><option value="business" ${u.plan === "business" ? "selected" : ""}>Business</option><option value="pro" ${u.plan === "pro" ? "selected" : ""}>Pro</option></select></div><div><label class="text-xs font-bold">Status</label><select id="status-${u.uid}" class="w-full px-3 py-2 rounded-xl border"><option value="active" ${u.status === "active" ? "selected" : ""}>Active</option><option value="inactive" ${u.status === "inactive" ? "selected" : ""}>Inactive</option></select></div><div><button onclick="adminUpdateUser('${u.uid}')" class="w-full px-4 py-3 rounded-xl bg-slate-900 text-white font-bold">Simpan</button></div></div>`; box.appendChild(div); });
+    }
+    window.adminUpdateUser = async function (uid) { const plan = el(`plan-${uid}`).value, status = el(`status-${uid}`).value; await updateDoc(doc(db, "users", uid), { plan, status, updatedAt: serverTimestamp() }); modal("Berhasil", "Paket/status user berhasil diperbarui."); await loadAdminUsers(); };
+
+    onAuthStateChanged(auth, async user => {
+      const publicSlug = new URLSearchParams(location.search).get("u");
+      if (publicSlug) return await loadPublicPage(publicSlug);
+      if (user) { currentUser = user; await loadDashboard(user.uid); } else currentUser = null;
+    });
+  </script>
+</body>
+</html>
