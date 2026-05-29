@@ -129,10 +129,10 @@
         <div><h2 class="font-black text-xl">Dashboard XLink Store</h2><p id="userPlanText" class="text-xs text-slate-500">Plan: Free</p></div>
         <div class="flex flex-wrap gap-2 justify-end">
           <button id="adminBtn" onclick="showAdminPanel()" class="hide px-4 py-2 rounded-xl bg-purple-600 text-white text-sm font-bold">Admin</button>
-          <button onclick="scrollToBilling()" class="px-4 py-2 rounded-xl bg-emerald-100 text-emerald-700 text-sm font-bold">Paket & Bayar</button>
-          <button onclick="scrollToWorkTools()" class="px-4 py-2 rounded-xl bg-blue-100 text-blue-700 text-sm font-bold">Tools Kerja</button>
-          <button onclick="copyPublicLink()" class="px-4 py-2 rounded-xl bg-slate-100 text-sm font-bold">Copy Link</button>
-          <button onclick="openPublicPage()" class="px-4 py-2 rounded-xl btn-main text-sm font-bold">Lihat Link</button>
+          <button id="billingNavBtn" onclick="scrollToBilling()" class="px-4 py-2 rounded-xl bg-emerald-100 text-emerald-700 text-sm font-bold">Paket & Bayar</button>
+          <button id="workNavBtn" onclick="scrollToWorkTools()" class="px-4 py-2 rounded-xl bg-blue-100 text-blue-700 text-sm font-bold">Tools Kerja</button>
+          <button id="copyPublicBtn" onclick="copyPublicLink()" class="px-4 py-2 rounded-xl bg-slate-100 text-sm font-bold">Copy Link</button>
+          <button id="openPublicBtn" onclick="openPublicPage()" class="px-4 py-2 rounded-xl btn-main text-sm font-bold">Lihat Link</button>
           <button onclick="logout()" class="px-4 py-2 rounded-xl bg-slate-900 text-white text-sm font-bold">Logout</button>
         </div>
       </div>
@@ -140,7 +140,7 @@
 
     <main class="max-w-7xl mx-auto p-5 grid lg:grid-cols-3 gap-5">
       <div class="lg:col-span-2 space-y-5">
-        <div class="grid md:grid-cols-4 gap-3">
+        <div id="dashboardStats" class="grid md:grid-cols-4 gap-3">
           <div class="bg-white rounded-3xl p-5 border"><p class="text-xs text-slate-500">Total Klik</p><b id="statTotalClicks" class="text-3xl">0</b></div>
           <div class="bg-white rounded-3xl p-5 border"><p class="text-xs text-slate-500">Link</p><b id="statLinks" class="text-3xl">0</b></div>
           <div class="bg-white rounded-3xl p-5 border"><p class="text-xs text-slate-500">Produk</p><b id="statProducts" class="text-3xl">0</b></div>
@@ -155,6 +155,7 @@
             <div><label class="text-sm font-bold">Nomor WhatsApp</label><input id="whatsapp" class="w-full mt-1 px-4 py-3 rounded-xl border" placeholder="6285111033789" /></div>
             <div><label class="text-sm font-bold">Template Tampilan</label><select id="themeColor" class="w-full mt-1 px-4 py-3 rounded-xl border"><option value="orange">Orange Enerjik</option><option value="blue">Biru Profesional</option><option value="green">Hijau Natural</option><option value="dark">Dark Premium</option><option value="elegant">Elegant Purple</option></select></div>
             <div><label class="text-sm font-bold">Kategori Bisnis</label><select id="businessCategory" class="w-full mt-1 px-4 py-3 rounded-xl border"><option value="UMKM">UMKM</option><option value="Jasa">Jasa</option><option value="Toko Online">Toko Online</option><option value="Produk Digital">Produk Digital</option><option value="Perusahaan">Perusahaan</option><option value="Teknisi">Teknisi</option><option value="Konsultan">Konsultan</option></select></div>
+            <div><label class="text-sm font-bold">Mode Aplikasi</label><select id="appMode" class="w-full mt-1 px-4 py-3 rounded-xl border"><option value="sales">Jualan / Store</option><option value="tools">Tools Kerja</option><option value="hybrid">Gabungan: Jualan + Tools</option></select><p class="text-xs text-slate-500 mt-1">Pilih Tools Kerja agar menu jualan disembunyikan dari dashboard user.</p></div>
             <div><label class="text-sm font-bold">Headline Promosi</label><input id="headline" class="w-full mt-1 px-4 py-3 rounded-xl border" placeholder="Contoh: Semua kebutuhan bisnis dalam satu link" /></div>
           </div>
           <div class="mt-4"><label class="text-sm font-bold">Deskripsi Singkat</label><textarea id="bioText" class="w-full mt-1 px-4 py-3 rounded-xl border" rows="3"></textarea></div>
@@ -162,9 +163,9 @@
           <p id="profileMsg" class="text-sm mt-3"></p>
         </div>
 
-        <div class="bg-white rounded-3xl p-6 border">
-          <h3 class="font-black text-2xl">QR Code Promosi</h3>
-          <p class="text-slate-500 text-sm mt-1">QR ini bisa dipakai untuk brosur, kartu nama, stiker toko, dan katalog cetak.</p>
+        <div id="qrSection" class="bg-white rounded-3xl p-6 border">
+          <h3 id="qrSectionTitle" class="font-black text-2xl">QR Code Promosi</h3>
+          <p id="qrSectionDesc" class="text-slate-500 text-sm mt-1">QR ini bisa dipakai untuk brosur, kartu nama, stiker toko, dan katalog cetak.</p>
           <div class="flex flex-col md:flex-row gap-5 items-center mt-5">
             <div class="bg-slate-50 rounded-3xl p-5 border text-center"><img id="qrImg" alt="QR Code Link Publik" class="w-[210px] h-[210px] mx-auto rounded-xl bg-white p-2" /><a id="qrDownload" href="#" target="_blank" class="inline-block mt-3 text-sm font-bold text-orange-600">Buka/Download QR</a></div>
             <div class="flex-1"><p id="publicLinkText" class="text-sm bg-slate-50 rounded-xl p-3 break-all border"></p><button onclick="copyPublicLink()" class="mt-3 px-5 py-3 rounded-2xl bg-slate-900 text-white font-black">Copy Link Publik</button></div>
@@ -296,14 +297,14 @@
           </div>
         </div>
 
-        <div class="bg-white rounded-3xl p-6 border">
+        <div id="salesLinksSection" class="bg-white rounded-3xl p-6 border">
           <div class="flex items-center justify-between gap-3"><h3 class="font-black text-2xl">Tombol Link</h3><span id="linkLimitText" class="text-xs bg-orange-100 text-orange-700 px-3 py-1 rounded-full font-bold">0/3</span></div>
           <div class="grid md:grid-cols-4 gap-3 mt-5"><input id="linkTitle" class="px-4 py-3 rounded-xl border" placeholder="Judul tombol" /><select id="linkType" class="px-4 py-3 rounded-xl border"><option value="general">Umum</option><option value="whatsapp">WhatsApp</option><option value="marketplace">Marketplace</option><option value="maps">Google Maps</option><option value="pdf">PDF/Katalog</option><option value="social">Sosial Media</option></select><input id="linkUrl" class="px-4 py-3 rounded-xl border md:col-span-2" placeholder="https:// atau https://wa.me/..." /></div>
           <button onclick="addLink()" class="mt-3 px-5 py-3 rounded-2xl bg-slate-900 text-white font-black">Tambah Link</button>
           <div id="linksList" class="mt-5 space-y-3"></div>
         </div>
 
-        <div class="bg-white rounded-3xl p-6 border">
+        <div id="salesProductsSection" class="bg-white rounded-3xl p-6 border">
           <div class="flex items-center justify-between gap-3"><h3 class="font-black text-2xl">Produk / Jasa</h3><span id="productLimitText" class="text-xs bg-orange-100 text-orange-700 px-3 py-1 rounded-full font-bold">0/2</span></div>
           <div class="grid md:grid-cols-2 gap-3 mt-5"><input id="productName" class="px-4 py-3 rounded-xl border" placeholder="Nama produk" /><input id="productPrice" class="px-4 py-3 rounded-xl border" placeholder="Harga, contoh: Rp 49.000" /><input id="productImage" class="px-4 py-3 rounded-xl border md:col-span-2" placeholder="URL gambar produk, boleh kosong" /><textarea id="productDesc" class="px-4 py-3 rounded-xl border md:col-span-2" placeholder="Deskripsi produk" rows="2"></textarea></div>
           <button onclick="addProduct()" class="mt-3 px-5 py-3 rounded-2xl bg-slate-900 text-white font-black">Tambah Produk</button>
@@ -311,7 +312,7 @@
         </div>
       </div>
 
-      <aside><div class="sticky top-24"><h3 class="font-black text-xl mb-3">Preview HP</h3><div class="phone-frame"><div id="previewBox" class="p-5 min-h-[650px]"></div></div></div></aside>
+      <aside id="previewAside"><div class="sticky top-24"><h3 id="previewTitle" class="font-black text-xl mb-3">Preview HP</h3><div class="phone-frame"><div id="previewBox" class="p-5 min-h-[650px]"></div></div></div></aside>
     </main>
   </section>
 
@@ -433,7 +434,7 @@
         let slug = slugify(name) || "user-" + uid.slice(0, 6);
         const slugSnap = await getDoc(doc(db, "slugs", slug));
         if (slugSnap.exists()) slug = slug + "-" + uid.slice(0, 5);
-        await setDoc(doc(db, "users", uid), { uid, email, businessName: name, slug, whatsapp: "", headline: "Semua informasi bisnis dalam satu link.", bioText: "Selamat datang di halaman resmi kami.", businessCategory: "UMKM", themeColor: "orange", plan: "free", status: "active", billingStatus: "free_launch", brandingRemoved: false, customDomainEnabled: false, transactionFeeRate: 10, totalClicks: 0, createdAt: serverTimestamp(), updatedAt: serverTimestamp() });
+        await setDoc(doc(db, "users", uid), { uid, email, businessName: name, slug, whatsapp: "", headline: "Semua informasi bisnis dalam satu link.", bioText: "Selamat datang di halaman resmi kami.", businessCategory: "UMKM", appMode: "sales", themeColor: "orange", plan: "free", status: "active", billingStatus: "free_launch", brandingRemoved: false, customDomainEnabled: false, transactionFeeRate: 10, totalClicks: 0, createdAt: serverTimestamp(), updatedAt: serverTimestamp() });
         await setDoc(doc(db, "slugs", slug), { uid, slug, createdAt: serverTimestamp() });
       } catch (err) { el("authMsg").innerText = err.message; }
     };
@@ -487,6 +488,7 @@
         headline: "Semua informasi bisnis dalam satu link.",
         bioText: "Selamat datang di halaman resmi kami.",
         businessCategory: "UMKM",
+        appMode: "tools",
         themeColor: "orange",
         plan: "free",
         status: "active",
@@ -524,6 +526,7 @@
       el("headline").value = currentProfile.headline || "";
       el("bioText").value = currentProfile.bioText || "";
       el("businessCategory").value = currentProfile.businessCategory || "UMKM";
+      if (el("appMode")) el("appMode").value = currentProfile.appMode || (currentProfile.fieldToolsEnabled ? "tools" : "sales");
       el("themeColor").value = currentProfile.themeColor || "orange";
       try { await loadLinks(uid); } catch (err) { console.warn("loadLinks gagal", err); currentLinks = []; }
       try { await loadProducts(uid); } catch (err) { console.warn("loadProducts gagal", err); currentProducts = []; }
@@ -562,8 +565,59 @@
       el("statTotalClicks").innerText = currentProfile.totalClicks || currentClicks.length || 0;
       el("statLinks").innerText = currentLinks.length; el("statProducts").innerText = currentProducts.length; el("statStatus").innerText = currentProfile.status === "active" ? "Aktif" : "Nonaktif";
       if (currentUser && ADMIN_EMAILS.includes(currentUser.email)) el("adminBtn").classList.remove("hide"); else el("adminBtn").classList.add("hide");
-      const publicUrl = getPublicLink(currentProfile.slug); el("publicLinkText").innerText = publicUrl; generateQr(publicUrl); renderLinksList(); renderProductsList(); renderBillingPanel(); renderWorkToolsPanel(); renderPreview();
+      const activeUrl = getActiveShareLink(); el("publicLinkText").innerText = activeUrl; generateQr(activeUrl); renderLinksList(); renderProductsList(); renderBillingPanel(); renderWorkToolsPanel(); renderPreview(); applyAppModeUI();
     }
+    function getAppMode() {
+      return currentProfile?.appMode || (currentProfile?.fieldToolsEnabled ? "tools" : "sales");
+    }
+    function isToolsOnlyMode() {
+      return getAppMode() === "tools";
+    }
+    function getToolsLink(slug) {
+      return `${getBaseUrl()}?tools=${encodeURIComponent(slug || "")}`;
+    }
+    function getActiveShareLink() {
+      return isToolsOnlyMode() ? getToolsLink(currentProfile.slug) : getPublicLink(currentProfile.slug);
+    }
+    function setVisible(id, visible) {
+      const node = el(id);
+      if (!node) return;
+      node.classList.toggle("hide", !visible);
+    }
+    function applyAppModeUI() {
+      const mode = getAppMode();
+      const toolsOnly = mode === "tools";
+      const salesOn = mode === "sales" || mode === "hybrid";
+      const toolsOn = mode === "tools" || mode === "hybrid";
+
+      setVisible("workToolsSection", toolsOn);
+      setVisible("salesLinksSection", salesOn);
+      setVisible("salesProductsSection", salesOn);
+      setVisible("previewAside", salesOn);
+      setVisible("copyPublicBtn", true);
+      setVisible("openPublicBtn", salesOn);
+      setVisible("workNavBtn", toolsOn);
+
+      if (el("qrSectionTitle")) el("qrSectionTitle").innerText = toolsOnly ? "QR Code Portal Tools" : "QR Code Promosi";
+      if (el("qrSectionDesc")) el("qrSectionDesc").innerText = toolsOnly
+        ? "QR ini khusus untuk akses portal tools kerja. Menu jualan disembunyikan agar user lapangan fokus input data, survei, notes, dan tugas."
+        : "QR ini bisa dipakai untuk brosur, kartu nama, stiker toko, dan katalog cetak.";
+      if (el("openPublicBtn")) el("openPublicBtn").innerText = toolsOnly ? "Buka Tools" : "Lihat Link";
+      if (el("copyPublicBtn")) el("copyPublicBtn").innerText = toolsOnly ? "Copy Link Tools" : "Copy Link";
+      if (el("userPlanText")) {
+        const plan = currentProfile.plan || "free";
+        el("userPlanText").innerText = `Mode: ${toolsOnly ? "TOOLS KERJA" : mode === "hybrid" ? "HYBRID" : "JUALAN"} • Plan: ${plan.toUpperCase()} • Status: ${(currentProfile.status || "active").toUpperCase()}`;
+      }
+      if (el("statLinks") && toolsOnly) {
+        el("statLinks").parentElement.querySelector("p").innerText = "Survei/Data";
+        el("statLinks").innerText = currentSurveys.length;
+      }
+      if (el("statProducts") && toolsOnly) {
+        el("statProducts").parentElement.querySelector("p").innerText = "Tugas";
+        el("statProducts").innerText = currentTasks.length;
+      }
+    }
+
     function generateQr(url) {
       const img = el("qrImg");
       const link = el("qrDownload");
@@ -809,7 +863,7 @@ Mohon diverifikasi.`;
         const oldSlug = currentProfile.slug, newSlug = slugify(el("slug").value);
         if (!newSlug) { el("profileMsg").className = "text-sm text-red-600 mt-3"; return el("profileMsg").innerText = "Slug tidak boleh kosong."; }
         if (newSlug !== oldSlug) { const slugSnap = await getDoc(doc(db, "slugs", newSlug)); if (slugSnap.exists()) { el("profileMsg").className = "text-sm text-red-600 mt-3"; return el("profileMsg").innerText = "Slug sudah dipakai user lain."; } await deleteDoc(doc(db, "slugs", oldSlug)); await setDoc(doc(db, "slugs", newSlug), { uid: currentUser.uid, slug: newSlug, createdAt: serverTimestamp() }); }
-        const data = { businessName: el("businessName").value.trim(), slug: newSlug, whatsapp: cleanPhone(el("whatsapp").value), headline: el("headline").value.trim(), bioText: el("bioText").value.trim(), businessCategory: el("businessCategory").value, themeColor: el("themeColor").value, updatedAt: serverTimestamp() };
+        const data = { businessName: el("businessName").value.trim(), slug: newSlug, whatsapp: cleanPhone(el("whatsapp").value), headline: el("headline").value.trim(), bioText: el("bioText").value.trim(), businessCategory: el("businessCategory").value, appMode: el("appMode") ? el("appMode").value : "sales", fieldToolsEnabled: el("appMode") ? el("appMode").value !== "sales" : true, themeColor: el("themeColor").value, updatedAt: serverTimestamp() };
         await setDoc(doc(db, "users", currentUser.uid), data, { merge: true });
         currentProfile = { ...currentProfile, ...data }; renderDashboard(); el("profileMsg").className = "text-sm text-green-600 mt-3"; el("profileMsg").innerText = "Profil berhasil disimpan.";
       } catch (err) { el("profileMsg").className = "text-sm text-red-600 mt-3"; el("profileMsg").innerText = err.message; }
@@ -835,8 +889,8 @@ Mohon diverifikasi.`;
       el("productName").value = ""; el("productPrice").value = ""; el("productImage").value = ""; el("productDesc").value = ""; await loadProducts(currentUser.uid); renderDashboard();
     };
     window.deleteProduct = async id => { if (!currentUser) return; await deleteDoc(doc(db, "users", currentUser.uid, "products", id)); await loadProducts(currentUser.uid); renderDashboard(); };
-    window.copyPublicLink = async function () { if (!currentProfile?.slug) return modal("Slug kosong", "Simpan profil dulu agar link publik aktif."); const url = getPublicLink(currentProfile.slug); try { await navigator.clipboard.writeText(url); modal("Link disalin", "Link publik sudah disalin. Siap dibagikan ke WhatsApp, Instagram, TikTok, dan Facebook."); } catch { modal("Link publik", url); } };
-    window.openPublicPage = () => { if (!currentProfile?.slug) return modal("Slug kosong", "Slug belum dibuat."); window.open(getPublicLink(currentProfile.slug), "_blank"); };
+    window.copyPublicLink = async function () { if (!currentProfile?.slug) return modal("Slug kosong", "Simpan profil dulu agar link publik aktif."); const url = getActiveShareLink(); try { await navigator.clipboard.writeText(url); modal("Link disalin", isToolsOnlyMode() ? "Link portal tools sudah disalin. Bagikan hanya ke tim kerja/surveyor." : "Link publik sudah disalin. Siap dibagikan ke WhatsApp, Instagram, TikTok, dan Facebook."); } catch { modal("Link publik", url); } };
+    window.openPublicPage = () => { if (!currentProfile?.slug) return modal("Slug kosong", "Slug belum dibuat."); window.open(getActiveShareLink(), "_blank"); };
 
     window.trackClick = async function (uid, type, targetId, title) {
       try {
@@ -847,6 +901,27 @@ Mohon diverifikasi.`;
       } catch (err) { console.log("Track click error:", err.message); }
     };
     window.sharePublicPage = async function () { const url = location.href; if (navigator.share) await navigator.share({ title: document.title, text: "Cek halaman bisnis ini", url }); else { await navigator.clipboard.writeText(url); alert("Link berhasil disalin."); } };
+
+    async function loadToolsPortal(slug) {
+      const slugSnap = await getDoc(doc(db, "slugs", slug));
+      if (!slugSnap.exists()) return showPublicError("Portal tools tidak ditemukan.");
+      const uid = slugSnap.data().uid;
+      const userSnap = await getDoc(doc(db, "users", uid));
+      if (!userSnap.exists()) return showPublicError("Profil tools belum tersedia.");
+      const profile = userSnap.data();
+      showOnly("publicPage");
+      el("publicPage").className = `min-h-screen px-5 py-8 public-bg-blue`;
+      el("publicContent").innerHTML = `
+        <div class="bg-white rounded-3xl p-8 shadow text-center">
+          <div class="w-20 h-20 rounded-full bg-blue-600 text-white mx-auto flex items-center justify-center text-3xl font-black">T</div>
+          <p class="text-xs text-blue-600 font-black mt-4">PORTAL TOOLS KERJA</p>
+          <h1 class="text-2xl font-black mt-1">${profile.businessName || "Tools Kerja"}</h1>
+          <p class="text-slate-600 text-sm mt-2">Link ini khusus untuk input data kerja, survei lapangan, voice notes, checklist tugas, dan laporan tim. Menu jualan/store tidak ditampilkan di portal ini.</p>
+          <button onclick="showLogin()" class="mt-6 w-full bg-blue-600 text-white rounded-2xl py-4 font-black">Login ke Tools Kerja</button>
+          <a href="${location.pathname}" class="block mt-3 text-sm font-bold text-slate-500">Kembali ke halaman utama</a>
+        </div>`;
+      document.title = `${profile.businessName || "XLink Store"} - Portal Tools Kerja`;
+    }
 
     async function loadPublicPage(slug) {
       const slugSnap = await getDoc(doc(db, "slugs", slug)); if (!slugSnap.exists()) return showPublicError("Halaman tidak ditemukan.");
@@ -936,11 +1011,15 @@ Mohon diverifikasi.`;
 
     onAuthStateChanged(auth, async user => {
       try {
-        const publicSlug = new URLSearchParams(location.search).get("u");
+        const params = new URLSearchParams(location.search);
+        const publicSlug = params.get("u");
+        const toolsSlug = params.get("tools");
+        if (toolsSlug && !user) return await loadToolsPortal(toolsSlug);
         if (publicSlug) return await loadPublicPage(publicSlug);
         if (user) {
           currentUser = user;
           await loadDashboard(user.uid);
+          if (new URLSearchParams(location.search).get("tools")) setTimeout(() => scrollToWorkTools(), 350);
         } else {
           currentUser = null;
         }
