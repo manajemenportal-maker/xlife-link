@@ -282,10 +282,54 @@
 
     window.logout = async function () { await signOut(auth); location.href = location.pathname; };
 
+    async function createMissingUserProfile(user) {
+      const email = user.email || "";
+      const baseName = email ? email.split("@")[0] : "User Baru";
+      let slug = slugify(baseName) || "user-" + user.uid.slice(0, 6);
+
+      const slugSnap = await getDoc(doc(db, "slugs", slug));
+      if (slugSnap.exists() && slugSnap.data().uid !== user.uid) {
+        slug = slug + "-" + user.uid.slice(0, 5);
+      }
+
+      const data = {
+        uid: user.uid,
+        email,
+        businessName: baseName,
+        slug,
+        whatsapp: "",
+        headline: "Semua informasi bisnis dalam satu link.",
+        bioText: "Selamat datang di halaman resmi kami.",
+        businessCategory: "UMKM",
+        themeColor: "orange",
+        plan: "free",
+        status: "active",
+        totalClicks: 0,
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp()
+      };
+
+      await setDoc(doc(db, "users", user.uid), data, { merge: true });
+      await setDoc(doc(db, "slugs", slug), { uid: user.uid, slug, createdAt: serverTimestamp() }, { merge: true });
+      return data;
+    }
+
     async function loadDashboard(uid) {
-      const snap = await getDoc(doc(db, "users", uid));
-      if (!snap.exists()) return modal("Profil belum ditemukan", "Akun ada, tapi dokumen user belum tersedia.");
-      currentProfile = snap.data();
+      let snap = await getDoc(doc(db, "users", uid));
+
+      if (!snap.exists()) {
+        try {
+          currentProfile = await createMissingUserProfile(currentUser);
+          modal("Profil diperbaiki", "Dokumen user belum ada, jadi sistem sudah membuat profil dasar otomatis. Silakan lengkapi nama bisnis, WhatsApp, dan slug.");
+        } catch (err) {
+          console.error(err);
+          modal("Profil belum bisa dibuat", "Akun Auth sudah ada, tapi dokumen user gagal dibuat. Pastikan Firestore Rules sudah benar lalu login ulang. Error: " + err.message);
+          return;
+        }
+      } else {
+        currentProfile = snap.data();
+      }
+
       el("businessName").value = currentProfile.businessName || "";
       el("slug").value = currentProfile.slug || "";
       el("whatsapp").value = currentProfile.whatsapp || "";
