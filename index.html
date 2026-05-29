@@ -129,6 +129,7 @@
         <div><h2 class="font-black text-xl">Dashboard XLink Store</h2><p id="userPlanText" class="text-xs text-slate-500">Plan: Free</p></div>
         <div class="flex flex-wrap gap-2 justify-end">
           <button id="adminBtn" onclick="showAdminPanel()" class="hide px-4 py-2 rounded-xl bg-purple-600 text-white text-sm font-bold">Admin</button>
+          <button onclick="scrollToBilling()" class="px-4 py-2 rounded-xl bg-emerald-100 text-emerald-700 text-sm font-bold">Paket & Bayar</button>
           <button onclick="copyPublicLink()" class="px-4 py-2 rounded-xl bg-slate-100 text-sm font-bold">Copy Link</button>
           <button onclick="openPublicPage()" class="px-4 py-2 rounded-xl btn-main text-sm font-bold">Lihat Link</button>
           <button onclick="logout()" class="px-4 py-2 rounded-xl bg-slate-900 text-white text-sm font-bold">Logout</button>
@@ -169,6 +170,48 @@
           </div>
         </div>
 
+        <div id="billingSection" class="bg-white rounded-3xl p-6 border">
+          <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+            <div>
+              <h3 class="font-black text-2xl">Paket & Pembayaran</h3>
+              <p class="text-slate-500 text-sm mt-1">Masa peluncuran: fitur utama gratis dulu. Menu pembayaran disiapkan untuk upgrade manual oleh admin.</p>
+            </div>
+            <div class="bg-emerald-50 text-emerald-700 rounded-2xl px-4 py-3 text-sm font-black">
+              <span id="billingStatusText">FREE LAUNCH</span>
+            </div>
+          </div>
+
+          <div class="grid md:grid-cols-4 gap-3 mt-5" id="planCards"></div>
+
+          <div class="mt-5 bg-slate-50 rounded-3xl p-5 border">
+            <h4 class="font-black text-xl">Ajukan Upgrade / Konfirmasi Pembayaran</h4>
+            <p class="text-sm text-slate-500 mt-1">Untuk tahap awal, customer klik ajukan paket lalu konfirmasi via WhatsApp. Admin bisa approve dari panel admin.</p>
+            <div class="grid md:grid-cols-3 gap-3 mt-4">
+              <select id="requestedPlan" class="px-4 py-3 rounded-xl border">
+                <option value="business">Business - Rp 75.000/bln</option>
+                <option value="pro">Pro - Rp 150.000/bln</option>
+                <option value="enterprise">Enterprise / Custom</option>
+              </select>
+              <select id="requestedDuration" class="px-4 py-3 rounded-xl border">
+                <option value="1">1 Bulan</option>
+                <option value="3">3 Bulan</option>
+                <option value="12">12 Bulan</option>
+              </select>
+              <input id="paymentNote" class="px-4 py-3 rounded-xl border" placeholder="Catatan / nama pengirim transfer" />
+            </div>
+            <div class="flex flex-col md:flex-row gap-2 mt-4">
+              <button onclick="requestUpgrade()" class="px-5 py-3 rounded-2xl btn-main font-black">Ajukan ke Admin</button>
+              <button onclick="confirmPaymentViaWA()" class="px-5 py-3 rounded-2xl bg-green-600 text-white font-black">Konfirmasi via WhatsApp</button>
+            </div>
+            <p class="text-xs text-slate-500 mt-3">Catatan: upload bukti transfer bisa kita tambahkan nanti setelah Firebase Storage aktif. Versi ini pakai catatan + WhatsApp dulu agar cepat jalan.</p>
+          </div>
+
+          <div class="mt-5">
+            <h4 class="font-black text-xl">Riwayat Request</h4>
+            <div id="paymentRequestsList" class="mt-3 space-y-3"></div>
+          </div>
+        </div>
+
         <div class="bg-white rounded-3xl p-6 border">
           <div class="flex items-center justify-between gap-3"><h3 class="font-black text-2xl">Tombol Link</h3><span id="linkLimitText" class="text-xs bg-orange-100 text-orange-700 px-3 py-1 rounded-full font-bold">0/3</span></div>
           <div class="grid md:grid-cols-4 gap-3 mt-5"><input id="linkTitle" class="px-4 py-3 rounded-xl border" placeholder="Judul tombol" /><select id="linkType" class="px-4 py-3 rounded-xl border"><option value="general">Umum</option><option value="whatsapp">WhatsApp</option><option value="marketplace">Marketplace</option><option value="maps">Google Maps</option><option value="pdf">PDF/Katalog</option><option value="social">Sosial Media</option></select><input id="linkUrl" class="px-4 py-3 rounded-xl border md:col-span-2" placeholder="https:// atau https://wa.me/..." /></div>
@@ -197,6 +240,17 @@
         <div class="bg-white rounded-3xl p-5 border"><p class="text-xs text-slate-500">Berbayar</p><b id="adminPaidUsers" class="text-3xl">0</b></div>
         <div class="bg-white rounded-3xl p-5 border"><p class="text-xs text-slate-500">Aktif</p><b id="adminActiveUsers" class="text-3xl">0</b></div>
       </div>
+      <div class="bg-white rounded-3xl p-5 border mb-5">
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-4">
+          <div>
+            <h3 class="font-black text-2xl">Kelola Pembayaran</h3>
+            <p class="text-sm text-slate-500">Approve request paket customer, aktifkan masa berlangganan, atau tolak request.</p>
+          </div>
+          <button onclick="loadAdminPaymentRequests()" class="px-4 py-2 rounded-xl bg-emerald-600 text-white text-sm font-bold">Refresh Pembayaran</button>
+        </div>
+        <div id="adminPaymentRequestsList" class="space-y-3"></div>
+      </div>
+
       <div class="bg-white rounded-3xl p-5 border"><h3 class="font-black text-2xl mb-4">Daftar User</h3><div id="adminUsersList" class="space-y-3"></div></div>
     </main>
   </section>
@@ -225,8 +279,14 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    let currentUser = null, currentProfile = null, currentLinks = [], currentProducts = [], currentClicks = [];
-    const limits = { free: { links: 3, products: 2 }, starter: { links: 10, products: 10 }, business: { links: 30, products: 50 }, pro: { links: 999, products: 200 } };
+    let currentUser = null, currentProfile = null, currentLinks = [], currentProducts = [], currentClicks = [], currentPaymentRequests = [];
+    const limits = { free: { links: 999, products: 999 }, starter: { links: 999, products: 999 }, business: { links: 999, products: 999 }, pro: { links: 999, products: 999 }, enterprise: { links: 999, products: 999 } };
+    const PLAN_INFO = {
+      free: { name: "Free Launch", price: 0, label: "Gratis masa peluncuran", fee: "10% bila checkout aktif", pages: "2 Pages", features: ["Unlimited link", "Unlimited produk", "QR Code", "Analytics dasar", "Branding tampil"] },
+      business: { name: "Business", price: 75000, label: "Rp 75.000/bulan", fee: "3% - 5%", pages: "5 Pages", features: ["Remove branding", "Custom appearance", "Custom domain", "Meta Pixel", "Google Analytics"] },
+      pro: { name: "Pro", price: 150000, label: "Rp 150.000/bulan", fee: "1% - 3%", pages: "5+ Pages", features: ["Team management", "Webhook", "Workflow", "Review custom", "PDF watermark"] },
+      enterprise: { name: "Enterprise", price: 0, label: "By request", fee: "Custom", pages: "Custom", features: ["Consultation", "Custom pages", "Integrasi API", "WA API", "Request khusus"] }
+    };
 
     function el(id) { return document.getElementById(id); }
     function showOnly(pageId) { ["landingPage", "authPage", "dashboardPage", "adminPage", "publicPage"].forEach(id => el(id).classList.add("hide")); el(pageId).classList.remove("hide"); }
@@ -237,6 +297,10 @@
     function moneyText(text) { return text || "Hubungi Admin"; }
     function getBaseUrl() { return location.origin + location.pathname; }
     function getPublicLink(slug) { return `${getBaseUrl()}?u=${encodeURIComponent(slug || "")}`; }
+    function formatRp(n) { return new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", maximumFractionDigits: 0 }).format(Number(n || 0)); }
+    function addMonths(date, months) { const d = new Date(date); d.setMonth(d.getMonth() + Number(months || 1)); return d; }
+    function getPlanAmount(plan, duration) { const info = PLAN_INFO[plan] || PLAN_INFO.business; return Number(info.price || 0) * Number(duration || 1); }
+    function publicWaNumber() { return "6285111033789"; }
     function encodeText(text) { return String(text || "").replace(/'/g, "\\'").replace(/"/g, "&quot;"); }
 
     function getTheme(profile) {
@@ -266,7 +330,7 @@
         let slug = slugify(name) || "user-" + uid.slice(0, 6);
         const slugSnap = await getDoc(doc(db, "slugs", slug));
         if (slugSnap.exists()) slug = slug + "-" + uid.slice(0, 5);
-        await setDoc(doc(db, "users", uid), { uid, email, businessName: name, slug, whatsapp: "", headline: "Semua informasi bisnis dalam satu link.", bioText: "Selamat datang di halaman resmi kami.", businessCategory: "UMKM", themeColor: "orange", plan: "free", status: "active", totalClicks: 0, createdAt: serverTimestamp(), updatedAt: serverTimestamp() });
+        await setDoc(doc(db, "users", uid), { uid, email, businessName: name, slug, whatsapp: "", headline: "Semua informasi bisnis dalam satu link.", bioText: "Selamat datang di halaman resmi kami.", businessCategory: "UMKM", themeColor: "orange", plan: "free", status: "active", billingStatus: "free_launch", brandingRemoved: false, customDomainEnabled: false, transactionFeeRate: 10, totalClicks: 0, createdAt: serverTimestamp(), updatedAt: serverTimestamp() });
         await setDoc(doc(db, "slugs", slug), { uid, slug, createdAt: serverTimestamp() });
       } catch (err) { el("authMsg").innerText = err.message; }
     };
@@ -359,6 +423,7 @@
       try { await loadLinks(uid); } catch (err) { console.warn("loadLinks gagal", err); currentLinks = []; }
       try { await loadProducts(uid); } catch (err) { console.warn("loadProducts gagal", err); currentProducts = []; }
       try { await loadClicks(uid); } catch (err) { console.warn("loadClicks gagal", err); currentClicks = []; }
+      try { await loadPaymentRequests(uid); } catch (err) { console.warn("loadPaymentRequests gagal", err); currentPaymentRequests = []; }
 
       showDashboard();
       try {
@@ -371,6 +436,7 @@
     async function loadLinks(uid) { currentLinks = []; const snap = await getDocs(query(collection(db, "users", uid, "links"), orderBy("createdAt", "asc"))); snap.forEach(d => currentLinks.push({ id: d.id, ...d.data() })); }
     async function loadProducts(uid) { currentProducts = []; const snap = await getDocs(query(collection(db, "users", uid, "products"), orderBy("createdAt", "asc"))); snap.forEach(d => currentProducts.push({ id: d.id, ...d.data() })); }
     async function loadClicks(uid) { currentClicks = []; const snap = await getDocs(query(collection(db, "users", uid, "clicks"), orderBy("createdAt", "desc"))); snap.forEach(d => currentClicks.push({ id: d.id, ...d.data() })); }
+    async function loadPaymentRequests(uid) { currentPaymentRequests = []; const snap = await getDocs(query(collection(db, "paymentRequests"), orderBy("createdAt", "desc"))); snap.forEach(d => { const data = { id: d.id, ...d.data() }; if (data.uid === uid) currentPaymentRequests.push(data); }); }
     window.showDashboard = () => showOnly("dashboardPage");
 
     function renderDashboard() {
@@ -381,7 +447,7 @@
       el("statTotalClicks").innerText = currentProfile.totalClicks || currentClicks.length || 0;
       el("statLinks").innerText = currentLinks.length; el("statProducts").innerText = currentProducts.length; el("statStatus").innerText = currentProfile.status === "active" ? "Aktif" : "Nonaktif";
       if (currentUser && ADMIN_EMAILS.includes(currentUser.email)) el("adminBtn").classList.remove("hide"); else el("adminBtn").classList.add("hide");
-      const publicUrl = getPublicLink(currentProfile.slug); el("publicLinkText").innerText = publicUrl; generateQr(publicUrl); renderLinksList(); renderProductsList(); renderPreview();
+      const publicUrl = getPublicLink(currentProfile.slug); el("publicLinkText").innerText = publicUrl; generateQr(publicUrl); renderLinksList(); renderProductsList(); renderBillingPanel(); renderPreview();
     }
     function generateQr(url) {
       const img = el("qrImg");
@@ -408,12 +474,104 @@
     }
     function renderPreview() { const theme = getTheme(currentProfile); el("previewBox").className = `p-5 min-h-[650px] ${theme.page}`; el("previewBox").innerHTML = buildPublicHtml(currentProfile, currentLinks, currentProducts, true); }
 
+    window.scrollToBilling = function () { const box = el("billingSection"); if (box) box.scrollIntoView({ behavior: "smooth", block: "start" }); };
+
+    function renderBillingPanel() {
+      const plan = currentProfile.plan || "free";
+      const billing = currentProfile.billingStatus || "free_launch";
+      const statusText = billing === "active" ? `AKTIF • ${String(plan).toUpperCase()}` : billing === "pending" ? "PENDING VERIFIKASI" : billing === "expired" ? "EXPIRED" : "FREE LAUNCH";
+      if (el("billingStatusText")) el("billingStatusText").innerText = statusText;
+
+      const cards = el("planCards");
+      if (cards) {
+        cards.innerHTML = Object.entries(PLAN_INFO).map(([key, p]) => {
+          const active = key === plan;
+          return `<div class="rounded-3xl p-5 border ${active ? "border-orange-300 bg-orange-50" : "bg-white"}">
+            <div class="flex items-center justify-between gap-2"><h4 class="font-black text-lg">${p.name}</h4>${active ? '<span class="text-xs bg-orange-600 text-white rounded-full px-2 py-1 font-bold">Aktif</span>' : ''}</div>
+            <p class="text-2xl font-black mt-2">${p.label}</p>
+            <p class="text-xs text-slate-500 mt-1">Fee transaksi: ${p.fee} • ${p.pages}</p>
+            <ul class="text-xs text-slate-600 mt-3 space-y-1">${p.features.slice(0,5).map(f => `<li>✓ ${f}</li>`).join("")}</ul>
+            <button onclick="selectPlan('${key}')" class="mt-4 w-full rounded-xl ${active ? "bg-slate-200 text-slate-600" : "bg-slate-900 text-white"} py-2 text-sm font-black">${active ? "Sedang Aktif" : "Pilih Paket"}</button>
+          </div>`;
+        }).join("");
+      }
+
+      const list = el("paymentRequestsList");
+      if (list) {
+        if (!currentPaymentRequests.length) list.innerHTML = `<p class="text-sm text-slate-500">Belum ada request pembayaran.</p>`;
+        else list.innerHTML = currentPaymentRequests.map(r => `<div class="bg-slate-50 border rounded-2xl p-4 flex flex-col md:flex-row md:items-center md:justify-between gap-2">
+          <div><b>${String(r.requestedPlan || "-").toUpperCase()}</b><p class="text-xs text-slate-500">${formatRp(r.amount)} • ${r.durationMonths || 1} bulan • ${r.note || "-"}</p></div>
+          <span class="text-xs rounded-full px-3 py-1 font-bold ${r.status === "approved" ? "bg-emerald-100 text-emerald-700" : r.status === "rejected" ? "bg-red-100 text-red-700" : "bg-yellow-100 text-yellow-700"}">${String(r.status || "pending").toUpperCase()}</span>
+        </div>`).join("");
+      }
+    }
+
+    window.selectPlan = function (plan) {
+      if (el("requestedPlan")) el("requestedPlan").value = plan === "free" ? "business" : plan;
+      scrollToBilling();
+    };
+
+
     function buildPublicHtml(profile, links, products, isPreview = false) {
       const theme = getTheme(profile), phone = cleanPhone(profile.whatsapp), waBase = phone ? `https://wa.me/${phone}` : "#", initials = (profile.businessName || "X").charAt(0).toUpperCase(), muted = theme.dark ? "text-slate-300" : "text-slate-600", cardClass = theme.card;
       const linksHtml = links.map(l => `<a href="${isPreview ? "javascript:void(0)" : l.url || "#"}" ${isPreview ? "" : `onclick="trackClick('${profile.uid}', 'link', '${l.id}', '${encodeText(l.title || "Link")}')" target="_blank"`} class="block ${cardClass} rounded-2xl p-4 shadow-sm font-bold text-center">${iconByType(l.type)} ${l.title || "Link"}</a>`).join("");
       const productsHtml = products.map(p => { const msg = encodeURIComponent(`Halo, saya mau tanya/order produk: ${p.name || ""}`); return `<div class="${cardClass} rounded-2xl p-3 shadow-sm"><div class="h-32 rounded-xl ${theme.soft} overflow-hidden flex items-center justify-center">${p.image ? `<img src="${p.image}" class="w-full h-full object-cover">` : `<span class="text-4xl">📦</span>`}</div><b class="block mt-3">${p.name || "-"}</b><p class="${theme.text} font-black">${moneyText(p.price)}</p><p class="text-sm ${muted} mt-1">${p.desc || ""}</p><a href="${isPreview ? "javascript:void(0)" : `${waBase}?text=${msg}`}" ${isPreview ? "" : `onclick="trackClick('${profile.uid}', 'product', '${p.id}', '${encodeText(p.name || "Produk")}')" target="_blank"`} class="block mt-3 ${theme.btn} text-white text-center rounded-xl py-2 font-black">Order</a></div>`; }).join("");
       return `<div class="text-center pt-5"><div class="w-24 h-24 rounded-full ${theme.btn} mx-auto flex items-center justify-center text-white text-4xl font-black">${initials}</div><p class="text-xs ${muted} mt-4">${profile.businessCategory || "Bisnis"}</p><h1 class="text-2xl font-black mt-1">${profile.businessName || "Nama Bisnis"}</h1><h2 class="font-bold mt-2">${profile.headline || ""}</h2><p class="${muted} text-sm mt-2">${profile.bioText || ""}</p></div>${phone ? `<a href="${isPreview ? "javascript:void(0)" : waBase}" ${isPreview ? "" : `onclick="trackClick('${profile.uid}', 'whatsapp', 'main-wa', 'WhatsApp Utama')" target="_blank"`} class="block mt-6 ${theme.btn} text-white text-center rounded-2xl py-4 font-black shadow-lg">💬 WhatsApp Sekarang</a>` : ""}<div class="mt-5 space-y-3">${linksHtml || `<p class="text-center text-sm ${muted}">Belum ada link.</p>`}</div><h2 class="font-black text-xl mt-8 mb-3">Produk / Jasa</h2><div class="grid grid-cols-2 gap-3">${productsHtml || `<p class="text-sm ${muted} col-span-2">Belum ada produk.</p>`}</div><div class="${cardClass} rounded-2xl p-4 mt-6 text-center"><p class="text-xs ${muted}">Bagikan halaman ini</p><button onclick="${isPreview ? "" : "sharePublicPage()"}" class="mt-2 px-4 py-2 rounded-xl ${theme.btn} text-white font-bold text-sm">Share Link</button></div><p class="text-center text-xs ${theme.dark ? "text-slate-400" : "text-slate-400"} mt-8">Dibuat dengan XLink Store</p>`;
     }
+
+
+    window.requestUpgrade = async function () {
+      try {
+        if (!currentUser || !currentProfile) return modal("Belum login", "Silakan login dulu.");
+        const requestedPlan = el("requestedPlan").value;
+        const durationMonths = Number(el("requestedDuration").value || 1);
+        const note = el("paymentNote").value.trim();
+        const amount = getPlanAmount(requestedPlan, durationMonths);
+        const payload = {
+          uid: currentUser.uid,
+          email: currentUser.email || currentProfile.email || "",
+          businessName: currentProfile.businessName || "",
+          slug: currentProfile.slug || "",
+          currentPlan: currentProfile.plan || "free",
+          requestedPlan,
+          durationMonths,
+          amount,
+          note,
+          status: "pending",
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp()
+        };
+        await addDoc(collection(db, "paymentRequests"), payload);
+        await setDoc(doc(db, "users", currentUser.uid), { billingStatus: "pending", lastRequestedPlan: requestedPlan, updatedAt: serverTimestamp() }, { merge: true });
+        currentProfile = { ...currentProfile, billingStatus: "pending", lastRequestedPlan: requestedPlan };
+        await loadPaymentRequests(currentUser.uid);
+        renderBillingPanel();
+        modal("Request terkirim", "Request upgrade sudah masuk ke admin. Lanjutkan konfirmasi via WhatsApp agar cepat diproses.");
+      } catch (err) {
+        console.error(err);
+        modal("Gagal request", err.message);
+      }
+    };
+
+    window.confirmPaymentViaWA = function () {
+      if (!currentProfile) return modal("Belum login", "Silakan login dulu.");
+      const requestedPlan = el("requestedPlan")?.value || "business";
+      const durationMonths = Number(el("requestedDuration")?.value || 1);
+      const amount = getPlanAmount(requestedPlan, durationMonths);
+      const note = el("paymentNote")?.value || "";
+      const msg = `Halo Admin XLink Store, saya mau konfirmasi paket.
+
+Nama Bisnis: ${currentProfile.businessName || "-"}
+Email: ${currentUser?.email || currentProfile.email || "-"}
+Link: ${getPublicLink(currentProfile.slug)}
+Paket: ${requestedPlan.toUpperCase()}
+Durasi: ${durationMonths} bulan
+Nominal: ${formatRp(amount)}
+Catatan: ${note || "-"}
+
+Mohon diverifikasi.`;
+      window.open(`https://wa.me/${publicWaNumber()}?text=${encodeURIComponent(msg)}`, "_blank");
+    };
 
     window.saveProfile = async function () {
       try {
@@ -470,12 +628,79 @@
     }
     function showPublicError(msg) { showOnly("publicPage"); el("publicPage").className = "min-h-screen px-5 py-8 public-bg-orange"; el("publicContent").innerHTML = `<div class="bg-white rounded-3xl p-8 text-center shadow"><h1 class="font-black text-2xl">Oops</h1><p class="text-slate-500 mt-2">${msg}</p><a href="${location.pathname}" class="inline-block mt-5 btn-main px-5 py-3 rounded-2xl font-black">Kembali</a></div>`; }
 
-    window.showAdminPanel = async function () { if (!currentUser || !ADMIN_EMAILS.includes(currentUser.email)) return modal("Akses ditolak", "Hanya admin pusat yang bisa membuka halaman ini."); showOnly("adminPage"); await loadAdminUsers(); };
+    window.showAdminPanel = async function () { if (!currentUser || !ADMIN_EMAILS.includes(currentUser.email)) return modal("Akses ditolak", "Hanya admin pusat yang bisa membuka halaman ini."); showOnly("adminPage"); await loadAdminUsers(); await loadAdminPaymentRequests(); };
+
+    window.loadAdminPaymentRequests = async function () {
+      const box = el("adminPaymentRequestsList");
+      if (!box) return;
+      box.innerHTML = `<p class="text-sm text-slate-500">Memuat request pembayaran...</p>`;
+      try {
+        const snap = await getDocs(query(collection(db, "paymentRequests"), orderBy("createdAt", "desc")));
+        const rows = [];
+        snap.forEach(d => rows.push({ id: d.id, ...d.data() }));
+        if (!rows.length) { box.innerHTML = `<p class="text-sm text-slate-500">Belum ada request pembayaran.</p>`; return; }
+        box.innerHTML = rows.map(r => `<div class="bg-slate-50 rounded-2xl p-4 border">
+          <div class="grid md:grid-cols-6 gap-3 items-center">
+            <div class="md:col-span-2"><b>${r.businessName || "-"}</b><p class="text-xs text-slate-500">${r.email || "-"}</p><p class="text-xs text-orange-600 font-bold">${String(r.requestedPlan || "-").toUpperCase()} • ${formatRp(r.amount)} • ${r.durationMonths || 1} bulan</p><p class="text-xs text-slate-500">${r.note || "Tidak ada catatan"}</p></div>
+            <div><label class="text-xs font-bold">Status</label><select id="pay-status-${r.id}" class="w-full px-3 py-2 rounded-xl border"><option value="pending" ${r.status === "pending" ? "selected" : ""}>Pending</option><option value="approved" ${r.status === "approved" ? "selected" : ""}>Approved</option><option value="rejected" ${r.status === "rejected" ? "selected" : ""}>Rejected</option></select></div>
+            <div><label class="text-xs font-bold">Paket</label><select id="pay-plan-${r.id}" class="w-full px-3 py-2 rounded-xl border"><option value="free">Free</option><option value="business" ${r.requestedPlan === "business" ? "selected" : ""}>Business</option><option value="pro" ${r.requestedPlan === "pro" ? "selected" : ""}>Pro</option><option value="enterprise" ${r.requestedPlan === "enterprise" ? "selected" : ""}>Enterprise</option></select></div>
+            <div><label class="text-xs font-bold">Durasi</label><input id="pay-duration-${r.id}" type="number" min="1" value="${r.durationMonths || 1}" class="w-full px-3 py-2 rounded-xl border" /></div>
+            <div class="flex flex-col gap-2"><button onclick="adminApplyPayment('${r.id}','${r.uid}')" class="px-4 py-2 rounded-xl bg-emerald-600 text-white font-bold text-sm">Apply</button><button onclick="adminRejectPayment('${r.id}')" class="px-4 py-2 rounded-xl bg-red-600 text-white font-bold text-sm">Tolak</button></div>
+          </div>
+        </div>`).join("");
+      } catch (err) {
+        console.error(err);
+        box.innerHTML = `<p class="text-sm text-red-600">Gagal memuat pembayaran: ${err.message}</p>`;
+      }
+    };
+
+    window.adminApplyPayment = async function (requestId, uid) {
+      try {
+        const status = el(`pay-status-${requestId}`).value;
+        const plan = el(`pay-plan-${requestId}`).value;
+        const durationMonths = Number(el(`pay-duration-${requestId}`).value || 1);
+        const expired = addMonths(new Date(), durationMonths);
+        await updateDoc(doc(db, "paymentRequests", requestId), { status, approvedAt: serverTimestamp(), updatedAt: serverTimestamp(), approvedBy: currentUser.email || "admin", appliedPlan: plan, durationMonths });
+        if (status === "approved") {
+          await setDoc(doc(db, "users", uid), {
+            plan,
+            billingStatus: "active",
+            planStartedAt: serverTimestamp(),
+            planExpiredAt: expired.toISOString(),
+            brandingRemoved: plan !== "free",
+            customDomainEnabled: ["business", "pro", "enterprise"].includes(plan),
+            analyticsEnabled: true,
+            metaPixelEnabled: ["business", "pro", "enterprise"].includes(plan),
+            googleAnalyticsEnabled: ["business", "pro", "enterprise"].includes(plan),
+            teamEnabled: ["pro", "enterprise"].includes(plan),
+            webhookEnabled: ["pro", "enterprise"].includes(plan),
+            watermarkEnabled: ["pro", "enterprise"].includes(plan),
+            transactionFeeRate: plan === "enterprise" ? 1 : plan === "pro" ? 3 : plan === "business" ? 5 : 10,
+            updatedAt: serverTimestamp()
+          }, { merge: true });
+        }
+        modal("Pembayaran diproses", status === "approved" ? "Paket user sudah diaktifkan." : "Status request sudah diperbarui.");
+        await loadAdminPaymentRequests();
+        await loadAdminUsers();
+      } catch (err) {
+        console.error(err);
+        modal("Gagal apply", err.message);
+      }
+    };
+
+    window.adminRejectPayment = async function (requestId) {
+      try {
+        await updateDoc(doc(db, "paymentRequests", requestId), { status: "rejected", updatedAt: serverTimestamp(), rejectedBy: currentUser.email || "admin" });
+        modal("Request ditolak", "Status pembayaran sudah ditolak.");
+        await loadAdminPaymentRequests();
+      } catch (err) { modal("Gagal menolak", err.message); }
+    };
+
     async function loadAdminUsers() {
       const snap = await getDocs(collection(db, "users")), users = []; snap.forEach(d => users.push({ id: d.id, ...d.data() }));
       el("adminTotalUsers").innerText = users.length; el("adminFreeUsers").innerText = users.filter(u => (u.plan || "free") === "free").length; el("adminPaidUsers").innerText = users.filter(u => (u.plan || "free") !== "free").length; el("adminActiveUsers").innerText = users.filter(u => (u.status || "active") === "active").length;
       const box = el("adminUsersList"); box.innerHTML = ""; if (!users.length) return box.innerHTML = `<p class="text-sm text-slate-500">Belum ada user.</p>`;
-      users.forEach(u => { const div = document.createElement("div"); div.className = "bg-slate-50 rounded-2xl p-4 border"; div.innerHTML = `<div class="grid md:grid-cols-5 gap-3 items-center"><div class="md:col-span-2"><b>${u.businessName || "-"}</b><p class="text-xs text-slate-500">${u.email || "-"}</p><p class="text-xs text-orange-600 font-bold">${getPublicLink(u.slug)}</p></div><div><label class="text-xs font-bold">Plan</label><select id="plan-${u.uid}" class="w-full px-3 py-2 rounded-xl border"><option value="free" ${u.plan === "free" ? "selected" : ""}>Free</option><option value="starter" ${u.plan === "starter" ? "selected" : ""}>Starter</option><option value="business" ${u.plan === "business" ? "selected" : ""}>Business</option><option value="pro" ${u.plan === "pro" ? "selected" : ""}>Pro</option></select></div><div><label class="text-xs font-bold">Status</label><select id="status-${u.uid}" class="w-full px-3 py-2 rounded-xl border"><option value="active" ${u.status === "active" ? "selected" : ""}>Active</option><option value="inactive" ${u.status === "inactive" ? "selected" : ""}>Inactive</option></select></div><div><button onclick="adminUpdateUser('${u.uid}')" class="w-full px-4 py-3 rounded-xl bg-slate-900 text-white font-bold">Simpan</button></div></div>`; box.appendChild(div); });
+      users.forEach(u => { const div = document.createElement("div"); div.className = "bg-slate-50 rounded-2xl p-4 border"; div.innerHTML = `<div class="grid md:grid-cols-5 gap-3 items-center"><div class="md:col-span-2"><b>${u.businessName || "-"}</b><p class="text-xs text-slate-500">${u.email || "-"}</p><p class="text-xs text-orange-600 font-bold">${getPublicLink(u.slug)}</p></div><div><label class="text-xs font-bold">Plan</label><select id="plan-${u.uid}" class="w-full px-3 py-2 rounded-xl border"><option value="free" ${u.plan === "free" ? "selected" : ""}>Free</option><option value="starter" ${u.plan === "starter" ? "selected" : ""}>Starter</option><option value="business" ${u.plan === "business" ? "selected" : ""}>Business</option><option value="pro" ${u.plan === "pro" ? "selected" : ""}>Pro</option><option value="enterprise" ${u.plan === "enterprise" ? "selected" : ""}>Enterprise</option></select></div><div><label class="text-xs font-bold">Status</label><select id="status-${u.uid}" class="w-full px-3 py-2 rounded-xl border"><option value="active" ${u.status === "active" ? "selected" : ""}>Active</option><option value="inactive" ${u.status === "inactive" ? "selected" : ""}>Inactive</option></select></div><div><button onclick="adminUpdateUser('${u.uid}')" class="w-full px-4 py-3 rounded-xl bg-slate-900 text-white font-bold">Simpan</button></div></div>`; box.appendChild(div); });
     }
     window.adminUpdateUser = async function (uid) { const plan = el(`plan-${uid}`).value, status = el(`status-${uid}`).value; await updateDoc(doc(db, "users", uid), { plan, status, updatedAt: serverTimestamp() }); modal("Berhasil", "Paket/status user berhasil diperbarui."); await loadAdminUsers(); };
 
