@@ -130,6 +130,7 @@
         <div class="flex flex-wrap gap-2 justify-end">
           <button id="adminBtn" onclick="showAdminPanel()" class="hide px-4 py-2 rounded-xl bg-purple-600 text-white text-sm font-bold">Admin</button>
           <button onclick="scrollToBilling()" class="px-4 py-2 rounded-xl bg-emerald-100 text-emerald-700 text-sm font-bold">Paket & Bayar</button>
+          <button onclick="scrollToWorkTools()" class="px-4 py-2 rounded-xl bg-blue-100 text-blue-700 text-sm font-bold">Tools Kerja</button>
           <button onclick="copyPublicLink()" class="px-4 py-2 rounded-xl bg-slate-100 text-sm font-bold">Copy Link</button>
           <button onclick="openPublicPage()" class="px-4 py-2 rounded-xl btn-main text-sm font-bold">Lihat Link</button>
           <button onclick="logout()" class="px-4 py-2 rounded-xl bg-slate-900 text-white text-sm font-bold">Logout</button>
@@ -212,6 +213,89 @@
           </div>
         </div>
 
+        <div id="workToolsSection" class="bg-white rounded-3xl p-6 border">
+          <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+            <div>
+              <h3 class="font-black text-2xl">Tools Kerja Lapangan</h3>
+              <p class="text-slate-500 text-sm mt-1">Untuk konsultan SID, surveyor, sales lapangan, teknisi, auditor, dan tim operasional. Data kerja tersimpan di akun masing-masing.</p>
+            </div>
+            <span class="bg-blue-50 text-blue-700 rounded-2xl px-4 py-3 text-sm font-black">FIELD TOOLS</span>
+          </div>
+
+          <div class="grid md:grid-cols-4 gap-3 mt-5">
+            <div class="bg-slate-50 rounded-3xl p-5 border"><p class="text-xs text-slate-500">Survei/Data</p><b id="workSurveyCount" class="text-3xl">0</b></div>
+            <div class="bg-slate-50 rounded-3xl p-5 border"><p class="text-xs text-slate-500">Voice Notes</p><b id="workNoteCount" class="text-3xl">0</b></div>
+            <div class="bg-slate-50 rounded-3xl p-5 border"><p class="text-xs text-slate-500">Tugas</p><b id="workTaskCount" class="text-3xl">0</b></div>
+            <div class="bg-slate-50 rounded-3xl p-5 border"><p class="text-xs text-slate-500">Selesai</p><b id="workDoneCount" class="text-3xl">0</b></div>
+          </div>
+
+          <div class="mt-6 grid lg:grid-cols-2 gap-5">
+            <div class="bg-slate-50 rounded-3xl p-5 border">
+              <h4 class="font-black text-xl">Form Survei / SID</h4>
+              <p class="text-sm text-slate-500 mt-1">Cocok untuk input data lapangan: lokasi, komoditas, luas, narasumber, kebutuhan bibit/alat, dan catatan verifikasi.</p>
+              <div class="grid md:grid-cols-2 gap-3 mt-4">
+                <input id="surveyProject" class="px-4 py-3 rounded-xl border" placeholder="Nama proyek / kegiatan" />
+                <select id="surveyType" class="px-4 py-3 rounded-xl border"><option>SID Pertanian</option><option>Survei Stok</option><option>Survei Lokasi</option><option>Visit Customer</option><option>Service/Inspeksi</option><option>Audit Lapangan</option></select>
+                <input id="surveyPerson" class="px-4 py-3 rounded-xl border" placeholder="Narasumber / PIC" />
+                <input id="surveyPhone" class="px-4 py-3 rounded-xl border" placeholder="No. HP/WA" />
+                <input id="surveyLocation" class="px-4 py-3 rounded-xl border md:col-span-2" placeholder="Alamat / desa / kecamatan / kabupaten" />
+                <input id="surveyCoordinate" class="px-4 py-3 rounded-xl border md:col-span-2" placeholder="Koordinat GPS" />
+                <textarea id="surveyData" class="px-4 py-3 rounded-xl border md:col-span-2" rows="4" placeholder="Data teknis: komoditas, luas lahan, jumlah penerima, kebutuhan bibit/alsintan, kondisi lapangan, kendala, rekomendasi..."></textarea>
+              </div>
+              <div class="flex flex-col md:flex-row gap-2 mt-4">
+                <button onclick="getGPSForSurvey()" class="px-5 py-3 rounded-2xl bg-blue-600 text-white font-black">Ambil GPS</button>
+                <button onclick="saveSurveyRecord()" class="px-5 py-3 rounded-2xl bg-slate-900 text-white font-black">Simpan Survei</button>
+              </div>
+            </div>
+
+            <div class="bg-slate-50 rounded-3xl p-5 border">
+              <h4 class="font-black text-xl">Voice Notes → Teks</h4>
+              <p class="text-sm text-slate-500 mt-1">Surveyor bisa bicara, lalu catatan tersimpan sebagai teks. Fitur ini memakai dukungan browser, paling cocok di Chrome Android.</p>
+              <div class="grid md:grid-cols-2 gap-3 mt-4">
+                <select id="noteCategory" class="px-4 py-3 rounded-xl border"><option>Catatan SID</option><option>Catatan Meeting</option><option>Catatan Customer</option><option>Catatan Teknis</option><option>Ide / Follow Up</option></select>
+                <input id="noteTitle" class="px-4 py-3 rounded-xl border" placeholder="Judul catatan" />
+                <textarea id="voiceText" class="px-4 py-3 rounded-xl border md:col-span-2" rows="7" placeholder="Hasil suara menjadi teks akan muncul di sini. Bisa juga diketik manual."></textarea>
+              </div>
+              <div class="flex flex-col md:flex-row gap-2 mt-4">
+                <button onclick="startVoiceInput()" class="px-5 py-3 rounded-2xl bg-green-600 text-white font-black">Mulai Bicara</button>
+                <button onclick="stopVoiceInput()" class="px-5 py-3 rounded-2xl bg-slate-200 text-slate-800 font-black">Stop</button>
+                <button onclick="saveVoiceNote()" class="px-5 py-3 rounded-2xl bg-slate-900 text-white font-black">Simpan Note</button>
+              </div>
+              <p id="voiceStatus" class="text-xs text-slate-500 mt-3">Status: siap.</p>
+            </div>
+          </div>
+
+          <div class="mt-6 grid lg:grid-cols-2 gap-5">
+            <div class="bg-slate-50 rounded-3xl p-5 border">
+              <h4 class="font-black text-xl">Tugas / Checklist Tim</h4>
+              <div class="grid md:grid-cols-2 gap-3 mt-4">
+                <input id="taskTitle" class="px-4 py-3 rounded-xl border md:col-span-2" placeholder="Contoh: Verifikasi data kelompok tani" />
+                <input id="taskAssignee" class="px-4 py-3 rounded-xl border" placeholder="PIC / petugas" />
+                <input id="taskDue" type="date" class="px-4 py-3 rounded-xl border" />
+                <select id="taskPriority" class="px-4 py-3 rounded-xl border"><option>Normal</option><option>Penting</option><option>Mendesak</option></select>
+                <select id="taskStatus" class="px-4 py-3 rounded-xl border"><option>Open</option><option>Progress</option><option>Selesai</option></select>
+              </div>
+              <button onclick="saveTaskItem()" class="mt-4 px-5 py-3 rounded-2xl bg-slate-900 text-white font-black">Tambah Tugas</button>
+              <div id="tasksList" class="mt-4 space-y-3"></div>
+            </div>
+
+            <div class="bg-slate-50 rounded-3xl p-5 border">
+              <h4 class="font-black text-xl">Ringkasan Laporan Kerja</h4>
+              <p class="text-sm text-slate-500 mt-1">Ringkasan cepat untuk koordinasi internal, laporan harian, atau bahan follow-up ke klien.</p>
+              <div id="workReportBox" class="mt-4 bg-white rounded-2xl border p-4 text-sm text-slate-700 whitespace-pre-line"></div>
+              <div class="flex flex-col md:flex-row gap-2 mt-4">
+                <button onclick="copyWorkReport()" class="px-5 py-3 rounded-2xl bg-blue-600 text-white font-black">Copy Laporan</button>
+                <button onclick="sendWorkReportWA()" class="px-5 py-3 rounded-2xl bg-green-600 text-white font-black">Kirim WA Admin</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-6">
+            <h4 class="font-black text-xl">Data Terakhir</h4>
+            <div id="workRecentList" class="mt-3 space-y-3"></div>
+          </div>
+        </div>
+
         <div class="bg-white rounded-3xl p-6 border">
           <div class="flex items-center justify-between gap-3"><h3 class="font-black text-2xl">Tombol Link</h3><span id="linkLimitText" class="text-xs bg-orange-100 text-orange-700 px-3 py-1 rounded-full font-bold">0/3</span></div>
           <div class="grid md:grid-cols-4 gap-3 mt-5"><input id="linkTitle" class="px-4 py-3 rounded-xl border" placeholder="Judul tombol" /><select id="linkType" class="px-4 py-3 rounded-xl border"><option value="general">Umum</option><option value="whatsapp">WhatsApp</option><option value="marketplace">Marketplace</option><option value="maps">Google Maps</option><option value="pdf">PDF/Katalog</option><option value="social">Sosial Media</option></select><input id="linkUrl" class="px-4 py-3 rounded-xl border md:col-span-2" placeholder="https:// atau https://wa.me/..." /></div>
@@ -279,7 +363,7 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    let currentUser = null, currentProfile = null, currentLinks = [], currentProducts = [], currentClicks = [], currentPaymentRequests = [];
+    let currentUser = null, currentProfile = null, currentLinks = [], currentProducts = [], currentClicks = [], currentPaymentRequests = [], currentSurveys = [], currentVoiceNotes = [], currentTasks = [];
     const limits = { free: { links: 999, products: 999 }, starter: { links: 999, products: 999 }, business: { links: 999, products: 999 }, pro: { links: 999, products: 999 }, enterprise: { links: 999, products: 999 } };
     const PLAN_INFO = {
       free: { name: "Free Launch", price: 0, priceText: "Rp 0 / masa peluncuran", label: "Rp 0 / masa peluncuran", fee: "10% bila checkout aktif", pages: "2 Pages", features: ["Unlimited link", "Unlimited produk", "QR Code", "Analytics dasar", "Branding tampil"] },
@@ -407,6 +491,8 @@
         plan: "free",
         status: "active",
         totalClicks: 0,
+        workspaceEnabled: true,
+        fieldToolsEnabled: true,
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp()
       };
@@ -443,6 +529,7 @@
       try { await loadProducts(uid); } catch (err) { console.warn("loadProducts gagal", err); currentProducts = []; }
       try { await loadClicks(uid); } catch (err) { console.warn("loadClicks gagal", err); currentClicks = []; }
       try { await loadPaymentRequests(uid); } catch (err) { console.warn("loadPaymentRequests gagal", err); currentPaymentRequests = []; }
+      try { await loadWorkTools(uid); } catch (err) { console.warn("loadWorkTools gagal", err); currentSurveys = []; currentVoiceNotes = []; currentTasks = []; }
 
       showDashboard();
       try {
@@ -456,6 +543,15 @@
     async function loadProducts(uid) { currentProducts = []; const snap = await getDocs(query(collection(db, "users", uid, "products"), orderBy("createdAt", "asc"))); snap.forEach(d => currentProducts.push({ id: d.id, ...d.data() })); }
     async function loadClicks(uid) { currentClicks = []; const snap = await getDocs(query(collection(db, "users", uid, "clicks"), orderBy("createdAt", "desc"))); snap.forEach(d => currentClicks.push({ id: d.id, ...d.data() })); }
     async function loadPaymentRequests(uid) { currentPaymentRequests = []; const snap = await getDocs(query(collection(db, "paymentRequests"), orderBy("createdAt", "desc"))); snap.forEach(d => { const data = { id: d.id, ...d.data() }; if (data.uid === uid) currentPaymentRequests.push(data); }); }
+    async function loadWorkTools(uid) {
+      currentSurveys = []; currentVoiceNotes = []; currentTasks = [];
+      const surveySnap = await getDocs(query(collection(db, "users", uid, "fieldSurveys"), orderBy("createdAt", "desc")));
+      surveySnap.forEach(d => currentSurveys.push({ id: d.id, ...d.data() }));
+      const noteSnap = await getDocs(query(collection(db, "users", uid, "voiceNotes"), orderBy("createdAt", "desc")));
+      noteSnap.forEach(d => currentVoiceNotes.push({ id: d.id, ...d.data() }));
+      const taskSnap = await getDocs(query(collection(db, "users", uid, "workTasks"), orderBy("createdAt", "desc")));
+      taskSnap.forEach(d => currentTasks.push({ id: d.id, ...d.data() }));
+    }
     window.showDashboard = () => showOnly("dashboardPage");
 
     function renderDashboard() {
@@ -466,7 +562,7 @@
       el("statTotalClicks").innerText = currentProfile.totalClicks || currentClicks.length || 0;
       el("statLinks").innerText = currentLinks.length; el("statProducts").innerText = currentProducts.length; el("statStatus").innerText = currentProfile.status === "active" ? "Aktif" : "Nonaktif";
       if (currentUser && ADMIN_EMAILS.includes(currentUser.email)) el("adminBtn").classList.remove("hide"); else el("adminBtn").classList.add("hide");
-      const publicUrl = getPublicLink(currentProfile.slug); el("publicLinkText").innerText = publicUrl; generateQr(publicUrl); renderLinksList(); renderProductsList(); renderBillingPanel(); renderPreview();
+      const publicUrl = getPublicLink(currentProfile.slug); el("publicLinkText").innerText = publicUrl; generateQr(publicUrl); renderLinksList(); renderProductsList(); renderBillingPanel(); renderWorkToolsPanel(); renderPreview();
     }
     function generateQr(url) {
       const img = el("qrImg");
@@ -528,6 +624,121 @@
     window.selectPlan = function (plan) {
       if (el("requestedPlan")) el("requestedPlan").value = plan === "free" ? "business" : plan;
       scrollToBilling();
+    };
+
+    window.scrollToWorkTools = function () { const box = el("workToolsSection"); if (box) box.scrollIntoView({ behavior: "smooth", block: "start" }); };
+
+    function renderWorkToolsPanel() {
+      if (!el("workSurveyCount")) return;
+      const done = currentTasks.filter(t => String(t.status || "").toLowerCase() === "selesai").length;
+      el("workSurveyCount").innerText = currentSurveys.length;
+      el("workNoteCount").innerText = currentVoiceNotes.length;
+      el("workTaskCount").innerText = currentTasks.length;
+      el("workDoneCount").innerText = done;
+
+      const tasksBox = el("tasksList");
+      if (tasksBox) {
+        tasksBox.innerHTML = currentTasks.length ? currentTasks.slice(0, 8).map(t => `<div class="bg-white border rounded-2xl p-4 flex flex-col md:flex-row md:items-center md:justify-between gap-2"><div><b>${t.title || "-"}</b><p class="text-xs text-slate-500">PIC: ${t.assignee || "-"} • Due: ${t.dueDate || "-"} • ${t.priority || "Normal"}</p></div><select onchange="updateTaskStatus('${t.id}', this.value)" class="px-3 py-2 rounded-xl border text-sm"><option ${t.status === "Open" ? "selected" : ""}>Open</option><option ${t.status === "Progress" ? "selected" : ""}>Progress</option><option ${t.status === "Selesai" ? "selected" : ""}>Selesai</option></select></div>`).join("") : `<p class="text-sm text-slate-500">Belum ada tugas.</p>`;
+      }
+
+      const report = buildWorkReport();
+      if (el("workReportBox")) el("workReportBox").innerText = report;
+
+      const recent = [];
+      currentSurveys.slice(0,3).forEach(x => recent.push({ type: "Survei", title: x.project || x.type || "Survei", desc: `${x.location || "-"} • ${x.person || "-"}` }));
+      currentVoiceNotes.slice(0,3).forEach(x => recent.push({ type: "Voice Note", title: x.title || x.category || "Catatan", desc: String(x.text || "").slice(0,120) }));
+      currentTasks.slice(0,3).forEach(x => recent.push({ type: "Tugas", title: x.title || "Tugas", desc: `${x.status || "Open"} • PIC: ${x.assignee || "-"}` }));
+      if (el("workRecentList")) el("workRecentList").innerHTML = recent.length ? recent.map(x => `<div class="bg-slate-50 border rounded-2xl p-4"><p class="text-xs font-bold text-blue-600">${x.type}</p><b>${x.title}</b><p class="text-sm text-slate-500 mt-1">${x.desc}</p></div>`).join("") : `<p class="text-sm text-slate-500">Belum ada data kerja.</p>`;
+    }
+
+    function buildWorkReport() {
+      const biz = currentProfile?.businessName || "Akun";
+      const open = currentTasks.filter(t => (t.status || "Open") !== "Selesai").length;
+      const done = currentTasks.filter(t => (t.status || "") === "Selesai").length;
+      const lastSurvey = currentSurveys[0];
+      const lastNote = currentVoiceNotes[0];
+      return `LAPORAN KERJA - ${biz}\n\nTotal survei/data: ${currentSurveys.length}\nVoice notes: ${currentVoiceNotes.length}\nTugas open/progress: ${open}\nTugas selesai: ${done}\n\nSurvei terakhir: ${lastSurvey ? `${lastSurvey.project || lastSurvey.type || "-"} - ${lastSurvey.location || "-"}` : "Belum ada"}\nCatatan terakhir: ${lastNote ? `${lastNote.title || lastNote.category || "-"}` : "Belum ada"}\n\nCatatan: data ini bisa dipakai untuk laporan harian, rekap SID, visit customer, audit lapangan, atau follow-up internal.`;
+    }
+
+    window.getGPSForSurvey = function () {
+      if (!navigator.geolocation) return modal("GPS tidak tersedia", "Browser/perangkat ini tidak mendukung geolocation.");
+      navigator.geolocation.getCurrentPosition(pos => {
+        const c = `${pos.coords.latitude.toFixed(6)}, ${pos.coords.longitude.toFixed(6)}`;
+        el("surveyCoordinate").value = c;
+        modal("GPS berhasil", "Koordinat berhasil diambil: " + c);
+      }, err => modal("GPS gagal", err.message || "Izin lokasi ditolak."), { enableHighAccuracy: true, timeout: 12000 });
+    };
+
+    window.saveSurveyRecord = async function () {
+      if (!currentUser) return;
+      const data = {
+        project: el("surveyProject").value.trim(),
+        type: el("surveyType").value,
+        person: el("surveyPerson").value.trim(),
+        phone: cleanPhone(el("surveyPhone").value),
+        location: el("surveyLocation").value.trim(),
+        coordinate: el("surveyCoordinate").value.trim(),
+        data: el("surveyData").value.trim(),
+        createdAt: serverTimestamp()
+      };
+      if (!data.project && !data.location && !data.data) return modal("Data belum lengkap", "Isi minimal nama proyek, lokasi, atau data teknis survei.");
+      await addDoc(collection(db, "users", currentUser.uid, "fieldSurveys"), data);
+      ["surveyProject","surveyPerson","surveyPhone","surveyLocation","surveyCoordinate","surveyData"].forEach(id => el(id).value = "");
+      await loadWorkTools(currentUser.uid); renderWorkToolsPanel(); modal("Survei tersimpan", "Data survei/lapangan berhasil disimpan.");
+    };
+
+    let recognition = null;
+    window.startVoiceInput = function () {
+      const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SR) return modal("Voice belum didukung", "Browser ini belum mendukung speech-to-text. Gunakan Chrome Android/Chrome desktop terbaru, atau ketik manual di kolom catatan.");
+      recognition = new SR();
+      recognition.lang = "id-ID";
+      recognition.continuous = true;
+      recognition.interimResults = true;
+      recognition.onstart = () => { if (el("voiceStatus")) el("voiceStatus").innerText = "Status: mendengarkan suara..."; };
+      recognition.onresult = e => {
+        let finalText = "";
+        for (let i = e.resultIndex; i < e.results.length; i++) if (e.results[i].isFinal) finalText += e.results[i][0].transcript + " ";
+        if (finalText) el("voiceText").value = (el("voiceText").value + " " + finalText).trim();
+      };
+      recognition.onerror = e => { if (el("voiceStatus")) el("voiceStatus").innerText = "Status error: " + e.error; };
+      recognition.onend = () => { if (el("voiceStatus")) el("voiceStatus").innerText = "Status: berhenti."; };
+      recognition.start();
+    };
+    window.stopVoiceInput = function () { if (recognition) recognition.stop(); };
+
+    window.saveVoiceNote = async function () {
+      if (!currentUser) return;
+      const data = { category: el("noteCategory").value, title: el("noteTitle").value.trim(), text: el("voiceText").value.trim(), createdAt: serverTimestamp() };
+      if (!data.text) return modal("Catatan kosong", "Isi catatan dulu, baik lewat suara maupun ketik manual.");
+      await addDoc(collection(db, "users", currentUser.uid, "voiceNotes"), data);
+      el("noteTitle").value = ""; el("voiceText").value = "";
+      await loadWorkTools(currentUser.uid); renderWorkToolsPanel(); modal("Note tersimpan", "Voice note/catatan kerja berhasil disimpan.");
+    };
+
+    window.saveTaskItem = async function () {
+      if (!currentUser) return;
+      const data = { title: el("taskTitle").value.trim(), assignee: el("taskAssignee").value.trim(), dueDate: el("taskDue").value, priority: el("taskPriority").value, status: el("taskStatus").value, createdAt: serverTimestamp() };
+      if (!data.title) return modal("Tugas kosong", "Isi judul tugas/checklist dulu.");
+      await addDoc(collection(db, "users", currentUser.uid, "workTasks"), data);
+      el("taskTitle").value = ""; el("taskAssignee").value = ""; el("taskDue").value = ""; el("taskPriority").value = "Normal"; el("taskStatus").value = "Open";
+      await loadWorkTools(currentUser.uid); renderWorkToolsPanel();
+    };
+
+    window.updateTaskStatus = async function (id, status) {
+      if (!currentUser) return;
+      await updateDoc(doc(db, "users", currentUser.uid, "workTasks", id), { status, updatedAt: serverTimestamp() });
+      await loadWorkTools(currentUser.uid); renderWorkToolsPanel();
+    };
+
+    window.copyWorkReport = async function () {
+      const text = buildWorkReport();
+      try { await navigator.clipboard.writeText(text); modal("Laporan disalin", "Ringkasan laporan kerja sudah disalin."); } catch { modal("Laporan kerja", text); }
+    };
+
+    window.sendWorkReportWA = function () {
+      const msg = encodeURIComponent(buildWorkReport());
+      window.open(`https://wa.me/${publicWaNumber()}?text=${msg}`, "_blank");
     };
 
 
